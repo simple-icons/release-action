@@ -1,0 +1,12 @@
+name: 'Simple Icons Release'
+description: 'Automatical releases for Simple Icons'
+author: 'Eric Cornelissen'
+
+inputs:
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+    required: true
+
+runs:
+  using: 'node12'
+  main: 'lib/index.js'

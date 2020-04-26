@@ -253,18 +253,22 @@ async function *getFilesSinceLastRelease(client) {
     });
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
+    console.log(prs.map(pr => pr.number));
     for (let pr of prs) {
+      core.info(`processing PR #${pr.number}`);
       if (isMerged(pr) === false) {
         // If the PR is not merged the changes won't be included in this release
         continue;
       }
 
       if (isReleasePr(pr)) {
-        // Pevious release, earlier changes already release
+        // Pevious release, earlier changes already released
+        core.info(`found previous release, PR #${pr.number}`)
         return;
       }
 
       for await (let file of getPrFiles(client, pr.number)) {
+        core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
         yield file;
       }
@@ -283,7 +287,7 @@ async function *getFilesSinceLastRelease(client) {
 // Logic determining changes
 function getChangesFromFile(file, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
-    core.info(`Detected an icon was added`);
+    core.info(`Detected an icon was added ('${file.path}')`);
 
     const svgTitleMatch = file.content.match(SVG_TITLE_EXPR);
     return [{
@@ -294,7 +298,7 @@ function getChangesFromFile(file, id) {
       prNumbers: [file.prNumber],
     }];
   } else if (isIconFile(file.path) && file.status === STATUS_MODIFIED) {
-    core.info(`Detected an icon was modified`);
+    core.info(`Detected an icon was modified ('${file.path}')`);
 
     // before and after
     const svgTitleMatch = file.content.match(SVG_TITLE_EXPR);
@@ -306,7 +310,7 @@ function getChangesFromFile(file, id) {
       prNumbers: [file.prNumber],
     }];
   } else if (isIconFile(file.path) && file.status === STATUS_REMOVED) {
-    core.info(`Detected an icon was removed`);
+    core.info(`Detected an icon was removed ('${file.path}')`);
 
     const svgTitleMatch = file.content.match(SVG_TITLE_EXPR) || "FALLBACK";
     return [{

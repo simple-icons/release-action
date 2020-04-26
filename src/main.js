@@ -521,16 +521,12 @@ async function main() {
 
     const items = getChangesFromFile(file, i);
     for (let item of items) {
-      switch (item.changeType) {
-        case CHANGE_TYPE_ADD:
-          newIcons.push(item);
-          break;
-        case CHANGE_TYPE_UPDATE:
-          updatedIcons.push(item);
-          break;
-        case CHANGE_TYPE_REMOVED:
-          removedIcons.push(item);
-          break;
+      if (item.changeType === CHANGE_TYPE_ADD) {
+        newIcons.push(item);
+      } else if (item.changeType === CHANGE_TYPE_UPDATE) {
+        updatedIcons.push(item);
+      } else if (item.changeType === CHANGE_TYPE_REMOVED) {
+        removedIcons.push(item);
       }
     }
   }

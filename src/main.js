@@ -23,8 +23,8 @@ const RELEASE_PATCH = "patch";
 const RELEASE_MINOR = "minor";
 const RELEASE_MAJOR = "major";
 
-const DEVELOP = "develop";
-const MASTER = "master";
+const BRANCH_DEVELOP = "develop";
+const BRANCH_MASTER = "master";
 const REF_DEVELOP = "develop";
 const REF_MASTER = "master";
 
@@ -77,7 +77,7 @@ function isIconFile(path) {
 }
 
 function isReleasePr(pr) {
-  return pr.head.ref === "develop";
+  return pr.base.ref === BRANCH_MASTER;
 }
 
 function isSimpleIconsDataFile(path) {
@@ -480,7 +480,7 @@ async function createReleasePr(client, title, body) {
   core.debug(title);
   core.debug("\nPR body:");
   core.debug(body);
-  const prNumber = await createPullRequest(client, title, body, DEVELOP, MASTER);
+  const prNumber = await createPullRequest(client, title, body, BRANCH_DEVELOP, BRANCH_MASTER);
   core.debug(`\nNew release PR is: ${prNumber}`);
 
   core.debug(`Adding label '${RELEASE_LABEL}' to PR ${prNumber}`);

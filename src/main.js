@@ -448,7 +448,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   releaseNotes += `The new version will be: **v${newVersion}**\n`;
 
   if (newIcons.length > 0) {
-    releaseNotes += "\n## New Icons\n\n";
+    releaseNotes += "\n# New Icons\n\n";
     for (let newIcon of newIcons) {
       const prs = prNumbersToString(newIcon.prNumbers);
       releaseNotes += `- ${newIcon.name} (${prs})\n`;
@@ -456,7 +456,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   }
 
   if (updatedIcons.length > 0) {
-    releaseNotes += "\n## Updated Icons\n\n";
+    releaseNotes += "\n# Updated Icons\n\n";
     for (let updatedIcon of updatedIcons) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
       releaseNotes += `- ${updatedIcon.name} (${prs})\n`;
@@ -464,7 +464,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   }
 
   if (removedIcons.length > 0) {
-    releaseNotes += "\n## Removed Icons\n\n";
+    releaseNotes += "\n# Removed Icons\n\n";
     for (let removedIcon of removedIcons) {
       const prs = prNumbersToString(removedIcon.prNumbers);
       releaseNotes += `- ${removedIcon.name} (${prs})\n`;

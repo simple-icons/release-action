@@ -23,8 +23,8 @@ const RELEASE_PATCH = "patch";
 const RELEASE_MINOR = "minor";
 const RELEASE_MAJOR = "major";
 
-const DEVELOP = "develop";
-const MASTER = "master";
+const BRANCH_DEVELOP = "develop";
+const BRANCH_MASTER = "master";
 const REF_DEVELOP = "develop";
 const REF_MASTER = "master";
 
@@ -77,7 +77,7 @@ function isIconFile(path) {
 }
 
 function isReleasePr(pr) {
-  return pr.head.ref === "develop";
+  return pr.base.ref === BRANCH_MASTER;
 }
 
 function isSimpleIconsDataFile(path) {
@@ -253,18 +253,22 @@ async function *getFilesSinceLastRelease(client) {
     });
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
+    console.log(prs.map(pr => pr.number));
     for (let pr of prs) {
+      core.info(`processing PR #${pr.number}`);
       if (isMerged(pr) === false) {
         // If the PR is not merged the changes won't be included in this release
         continue;
       }
 
       if (isReleasePr(pr)) {
-        // Pevious release, earlier changes already release
+        // Pevious release, earlier changes already released
+        core.info(`found previous release, PR #${pr.number}`)
         return;
       }
 
       for await (let file of getPrFiles(client, pr.number)) {
+        core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
         yield file;
       }
@@ -283,7 +287,7 @@ async function *getFilesSinceLastRelease(client) {
 // Logic determining changes
 function getChangesFromFile(file, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
-    core.info(`Detected an icon was added`);
+    core.info(`Detected an icon was added ('${file.path}')`);
 
     const svgTitleMatch = file.content.match(SVG_TITLE_EXPR);
     return [{
@@ -294,7 +298,7 @@ function getChangesFromFile(file, id) {
       prNumbers: [file.prNumber],
     }];
   } else if (isIconFile(file.path) && file.status === STATUS_MODIFIED) {
-    core.info(`Detected an icon was modified`);
+    core.info(`Detected an icon was modified ('${file.path}')`);
 
     // before and after
     const svgTitleMatch = file.content.match(SVG_TITLE_EXPR);
@@ -306,7 +310,7 @@ function getChangesFromFile(file, id) {
       prNumbers: [file.prNumber],
     }];
   } else if (isIconFile(file.path) && file.status === STATUS_REMOVED) {
-    core.info(`Detected an icon was removed`);
+    core.info(`Detected an icon was removed ('${file.path}')`);
 
     const svgTitleMatch = file.content.match(SVG_TITLE_EXPR) || "FALLBACK";
     return [{
@@ -444,7 +448,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   releaseNotes += `The new version will be: **v${newVersion}**\n`;
 
   if (newIcons.length > 0) {
-    releaseNotes += "\n## New Icons\n\n";
+    releaseNotes += "\n# New Icons\n\n";
     for (let newIcon of newIcons) {
       const prs = prNumbersToString(newIcon.prNumbers);
       releaseNotes += `- ${newIcon.name} (${prs})\n`;
@@ -452,7 +456,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   }
 
   if (updatedIcons.length > 0) {
-    releaseNotes += "\n## Updated Icons\n\n";
+    releaseNotes += "\n# Updated Icons\n\n";
     for (let updatedIcon of updatedIcons) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
       releaseNotes += `- ${updatedIcon.name} (${prs})\n`;
@@ -460,7 +464,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   }
 
   if (removedIcons.length > 0) {
-    releaseNotes += "\n## Removed Icons\n\n";
+    releaseNotes += "\n# Removed Icons\n\n";
     for (let removedIcon of removedIcons) {
       const prs = prNumbersToString(removedIcon.prNumbers);
       releaseNotes += `- ${removedIcon.name} (${prs})\n`;
@@ -476,7 +480,7 @@ async function createReleasePr(client, title, body) {
   core.debug(title);
   core.debug("\nPR body:");
   core.debug(body);
-  const prNumber = await createPullRequest(client, title, body, DEVELOP, MASTER);
+  const prNumber = await createPullRequest(client, title, body, BRANCH_DEVELOP, BRANCH_MASTER);
   core.debug(`\nNew release PR is: ${prNumber}`);
 
   core.debug(`Adding label '${RELEASE_LABEL}' to PR ${prNumber}`);
@@ -517,16 +521,12 @@ async function main() {
 
     const items = getChangesFromFile(file, i);
     for (let item of items) {
-      switch (item.changeType) {
-        case CHANGE_TYPE_ADD:
-          newIcons.push(item);
-          break;
-        case CHANGE_TYPE_UPDATE:
-          updatedIcons.push(item);
-          break;
-        case CHANGE_TYPE_REMOVED:
-          removedIcons.push(item);
-          break;
+      if (item.changeType === CHANGE_TYPE_ADD) {
+        newIcons.push(item);
+      } else if (item.changeType === CHANGE_TYPE_UPDATE) {
+        updatedIcons.push(item);
+      } else if (item.changeType === CHANGE_TYPE_REMOVED) {
+        removedIcons.push(item);
       }
     }
   }

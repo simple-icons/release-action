@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
+const moment = require("moment");
 const semverInc = require("semver/functions/inc");
 
 const BASE64 = "base64";
@@ -237,10 +238,10 @@ async function *getPrFiles(client, prNumber) {
   }
 }
 
-async function *getFilesSinceLastRelease(client) {
+async function getFilesSinceLastRelease(client) {
   const perPage = 10;
 
-  let page = 1;
+  let files = [], page = 1;
   while(true) {
     const { data: prs } = await client.pulls.list({
       owner: github.context.repo.owner,
@@ -262,15 +263,16 @@ async function *getFilesSinceLastRelease(client) {
       }
 
       if (isReleasePr(pr)) {
-        // Pevious release, earlier changes already released
-        core.info(`found previous release, PR #${pr.number}`)
-        return;
+        // Pevious release, earlier changes definitely already released
+        core.info(`found previous release, PR #${pr.number}`);
+        return files.filter(file => moment(file.merged_at).isAfter(pr.merged_at));
       }
 
       for await (let file of getPrFiles(client, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
-        yield file;
+        file.merged_at = pr.merged_at;
+        files.push(file);
       }
     }
 
@@ -516,7 +518,9 @@ async function main() {
   const client = new github.GitHub(token);
 
   let newIcons = [], updatedIcons = [], removedIcons = [], i = 0;
-  for await (let file of getFilesSinceLastRelease(client)) {
+
+  const files = await getFilesSinceLastRelease(client);
+  for (let file of files) {
     i = i + 1;
 
     const items = getChangesFromFile(file, i);

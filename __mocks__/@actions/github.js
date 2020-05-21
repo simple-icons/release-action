@@ -193,7 +193,7 @@ const prFiles = {
     {
       filename: "icons/postman.svg",
       status: STATUS_MODIFIED,
-      patch: "+" + svgs["intel.svg"] + "\n-" + svgs["intel.svg"] + "bar"
+      patch: "+" + svgs["postman.svg"] + "\n-" + svgs["postman.svg"] + "bar"
     },
     {
       filename: SI_DATA_FILE,
@@ -279,7 +279,7 @@ const prFiles = {
 +            "source": "https://www.abstract.com/about/"
          },
          {
-             "title": "AddThis",
+             "title": "Hello world",
              "hex": "FF6550",
              "source": "https://www.intel.com"
 +        },

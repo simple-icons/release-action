@@ -31,8 +31,8 @@ const REF_MASTER = "master";
 
 const RELEASE_LABEL = "release";
 
-export const COMMIT_MODE_FILE = "100644";
-export const COMMIT_TYPE_BLOB = "blob";
+const COMMIT_MODE_FILE = "100644";
+const COMMIT_TYPE_BLOB = "blob";
 
 const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
 const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",\s.*\s-.*/g;
@@ -136,7 +136,6 @@ async function commitFiles(client, commitMessage, files) {
       type: COMMIT_TYPE_BLOB,
     });
   }
-
 
   core.debug("commitFiles - createTree");
   const { data: newTree } = await client.git.createTree({
@@ -254,7 +253,6 @@ async function getFilesSinceLastRelease(client) {
     });
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
-    console.log(prs.map(pr => pr.number));
     for (let pr of prs) {
       core.info(`processing PR #${pr.number}`);
       if (isMerged(pr) === false) {
@@ -278,7 +276,7 @@ async function getFilesSinceLastRelease(client) {
 
     if (prs.length < perPage) {
       // No Pull Requests left, break endless loop
-      return;
+      return [];
     }
 
     page += 1;
@@ -336,9 +334,6 @@ function getChangesFromFile(file, id) {
         prNumbers: [file.prNumber],
       });
     }
-
-    // const icon = icons.find(icon => icon.title === jsonTitleAddedMatch[1]);
-    // console.log(icon);
 
     return changes;
   } else {
@@ -551,3 +546,5 @@ async function main() {
 }
 
 main();
+
+module.exports = main;

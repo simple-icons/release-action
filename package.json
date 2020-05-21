@@ -10,11 +10,13 @@
     "email": "ericornelissen@gmail.com"
   },
   "scripts": {
-    "build": "ncc build src/main.js -m -o lib"
+    "build": "ncc build src/main.js -m -o lib",
+    "test": "jest"
   },
   "dependencies": {
     "@actions/core": "^1.2.3",
     "@actions/github": "^2.1.1",
+    "jest": "^26.0.1",
     "moment": "^2.25.3",
     "semver": "^7.3.2"
   },

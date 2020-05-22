@@ -351,7 +351,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
   let removeFromUpdated = [];
   for (let newIcon of newIcons) {
     for (let updatedIcon of updatedIcons) {
-      if (updatedIcon.path === newIcon.path) {
+      if (updatedIcon.name === newIcon.name) {
         newIcon.prNumbers.push(...updatedIcon.prNumbers);
         removeFromUpdated.push(updatedIcon);
       }
@@ -363,7 +363,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
   let removeFromAdded = [], removeFromRemoved = [];
   for (let newIcon of newIcons) {
     for (let removedIcon of removedIcons) {
-      if (removedIcon.path === newIcon.path) {
+      if (removedIcon.name === newIcon.name) {
         removeFromAdded.push(newIcon);
         removeFromRemoved.push(removedIcon);
       }
@@ -376,8 +376,26 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
   removeFromUpdated = [];
   for (let updatedIcon of updatedIcons) {
     for (let removedIcon of removedIcons) {
-      if (removedIcon.path === updatedIcon.path) {
+      if (removedIcon.name === updatedIcon.name) {
         removeFromUpdated.push(updatedIcon);
+      }
+    }
+  }
+  updatedIcons = updatedIcons.filter(a => !removeFromUpdated.some(b => a.id === b.id));
+
+  // An updated icon was updated multiple times
+  removeFromUpdated = [];
+  for (let i = 0; i < updatedIcons.length; i++) {
+    for (let j = i; j < updatedIcons.length; j++) {
+      const updatedIcon = updatedIcons[i], otherIcon = updatedIcons[j];
+      if (otherIcon.id === updatedIcon.id) {
+        continue;
+      }
+
+      if (otherIcon.name === updatedIcon.name) {
+        const otherPrNumbers = otherIcon.prNumbers.filter(prNumber => !updatedIcon.prNumbers.includes(prNumber));
+        updatedIcon.prNumbers.push(...otherPrNumbers);
+        removeFromUpdated.push(otherIcon);
       }
     }
   }

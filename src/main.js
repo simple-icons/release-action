@@ -35,7 +35,7 @@ const COMMIT_MODE_FILE = "100644";
 const COMMIT_TYPE_BLOB = "blob";
 
 const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
-const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",\s.*\s-.*/g;
+const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
 
 
 // Helper functions

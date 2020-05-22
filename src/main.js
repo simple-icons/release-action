@@ -3,6 +3,7 @@ const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
 const moment = require("moment");
 const semverInc = require("semver/functions/inc");
+const sortBy = require("lodash.sortby");
 
 const BASE64 = "base64";
 const UTF8 = "utf-8";
@@ -464,7 +465,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
 
   if (newIcons.length > 0) {
     releaseNotes += "\n# New Icons\n\n";
-    for (let newIcon of newIcons) {
+    for (let newIcon of sortBy(newIcons, ["name"])) {
       const prs = prNumbersToString(newIcon.prNumbers);
       releaseNotes += `- ${newIcon.name} (${prs})\n`;
     }
@@ -472,7 +473,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
 
   if (updatedIcons.length > 0) {
     releaseNotes += "\n# Updated Icons\n\n";
-    for (let updatedIcon of updatedIcons) {
+    for (let updatedIcon of sortBy(updatedIcons, ["name"])) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
       releaseNotes += `- ${updatedIcon.name} (${prs})\n`;
     }
@@ -480,7 +481,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
 
   if (removedIcons.length > 0) {
     releaseNotes += "\n# Removed Icons\n\n";
-    for (let removedIcon of removedIcons) {
+    for (let removedIcon of sortBy(removedIcons, ["name"])) {
       const prs = prNumbersToString(removedIcon.prNumbers);
       releaseNotes += `- ${removedIcon.name} (${prs})\n`;
     }

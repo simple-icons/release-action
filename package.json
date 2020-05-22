@@ -17,6 +17,7 @@
     "@actions/core": "^1.2.3",
     "@actions/github": "^2.1.1",
     "jest": "^26.0.1",
+    "lodash.sortby": "^4.7.0",
     "moment": "^2.25.3",
     "semver": "^7.3.2"
   },

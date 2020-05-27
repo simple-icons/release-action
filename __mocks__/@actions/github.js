@@ -81,6 +81,11 @@ const PRs = [ // https://developer.github.com/v3/pulls/#list-pull-requests
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
+  { // PR that changes the data file but no metadata
+    number: 511,
+    merged_at: "2011-01-26T19:01:12Z",
+    base: { ref: "develop" }
+  },
 
 
   { // Previous release
@@ -318,6 +323,20 @@ const prFiles = {
          {
              "title": "Simple Icons",
              "hex": "555555",`
+    }
+  ],
+  "511": [
+    {
+      filename: SI_DATA_FILE,
+      status: STATUS_MODIFIED,
+      patch: `"title": "Razer",
+              "hex": "00FF00",
+              "source": "https://en.wikipedia.org/wiki/File:Razer_snake_logo.svg"
++           },...
+-           },
+            {
+              "title": "React",
+              "hex": "61DAFB",`
     }
   ]
 };

@@ -1,6 +1,5 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { Octokit } = require("@octokit/rest");
 const moment = require("moment");
 const semverInc = require("semver/functions/inc");
 const sortBy = require("lodash.sortby");
@@ -262,7 +261,7 @@ async function getFilesSinceLastRelease(client) {
       }
 
       if (isReleasePr(pr)) {
-        // Pevious release, earlier changes definitely already released
+        // Previous release, earlier changes definitely already released
         core.info(`found previous release, PR #${pr.number}`);
         return files.filter(file => moment(file.merged_at).isAfter(pr.merged_at));
       }
@@ -344,10 +343,6 @@ function getChangesFromFile(file, id) {
 }
 
 function filterDuplicates(newIcons, updatedIcons, removedIcons) {
-  console.log("====================================================");
-  console.log("Before filtering", newIcons, updatedIcons, removedIcons);
-  console.log("====================================================");
-
   // An added icon was update before the release
   let removeFromUpdated = [];
   for (let newIcon of newIcons) {
@@ -401,10 +396,6 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     }
   }
   updatedIcons = updatedIcons.filter(a => !removeFromUpdated.some(b => a.id === b.id));
-
-  console.log("====================================================");
-  console.log("After filtering", newIcons, updatedIcons, removedIcons);
-  console.log("====================================================");
 
   return [newIcons, updatedIcons, removedIcons];
 }
@@ -496,6 +487,7 @@ async function createReleasePr(client, title, body) {
   core.debug(title);
   core.debug("\nPR body:");
   core.debug(body);
+
   const prNumber = await createPullRequest(client, title, body, BRANCH_DEVELOP, BRANCH_MASTER);
   core.debug(`\nNew release PR is: ${prNumber}`);
 

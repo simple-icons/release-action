@@ -86,6 +86,21 @@ const PRs = [ // https://developer.github.com/v3/pulls/#list-pull-requests
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
+  { // PR that adds a brand with a lowercased name
+    number: 512,
+    merged_at: "2011-01-26T19:01:12Z",
+    base: { ref: "develop" }
+  },
+  { // PR that adds ACM (which should be listed before the lowercased brand)
+    number: 513,
+    merged_at: "2011-01-26T19:01:12Z",
+    base: { ref: "develop" }
+  },
+  { // PR that adds a brand with an accented name
+    number: 514,
+    merged_at: "2011-01-26T19:01:12Z",
+    base: { ref: "develop" }
+  },
 
 
   { // Previous release
@@ -338,6 +353,72 @@ const prFiles = {
               "title": "React",
               "hex": "61DAFB",`
     }
+  ],
+  "512": [
+    {
+      filename: "icons/bar.svg",
+      status: STATUS_ADDED,
+      patch: "+" + svgs["bar.svg"]
+    },
+    {
+      filename: SI_DATA_FILE,
+      status: STATUS_MODIFIED,
+      patch: `"hex": "FF0000",
+             "source": "https://www.adobe.com/"
+         },
++        {
++            "title": "bar",
++            "hex": "FFFFFF",
++            "source": "https://www.example.org/"
++        },
+         {
+             "title": "Simple Icons",
+             "hex": "555555",`
+    }
+  ],
+  "513": [
+    {
+      filename: "icons/acm.svg",
+      status: STATUS_ADDED,
+      patch: "+" + svgs["acm.svg"]
+    },
+    {
+      filename: SI_DATA_FILE,
+      status: STATUS_MODIFIED,
+      patch: `"hex": "A9225C",
+             "source": "https://company-39138.frontify.com/d/7EKFm12NQSa8/accusoft-corporation-style-guide#/style-guide/logo"
+         },
++        {
++            "title": "ACM",
++            "hex": "0085CA",
++            "source": "http://identitystandards.acm.org/"
++        },
+         {
+             "title": "ActiGraph",
+             "hex": "0B2C4A",`
+    }
+  ],
+  "514": [
+    {
+      filename: "icons/pokemon.svg",
+      status: STATUS_ADDED,
+      patch: "+" + svgs["pokemon.svg"]
+    },
+    {
+      filename: SI_DATA_FILE,
+      status: STATUS_MODIFIED,
+      patch: `"hex": "F43E37",
+             "source": "https://blog.pocketcasts.com/press/"
+         },
++        {
++           "title": "Pokémon",
++           "hex": "FFCB05",
++           "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
++       },
+         {
+             "title": "Poly",
+             "hex": "EB3C00",`
+    }
   ]
 };
 
@@ -362,6 +443,14 @@ const files = {
     content: encode(svgs["addthis.svg"], BASE64),
     encoding: BASE64
   },
+  "icons/acm.svg": {
+    content: encode(svgs["acm.svg"], BASE64),
+    encoding: BASE64
+  },
+  "icons/bar.svg": {
+    content: encode(svgs["bar.svg"], BASE64),
+    encoding: BASE64
+  },
   "icons/feedly.svg": {
     content: encode(svgs["feedly.svg"], BASE64),
     encoding: BASE64
@@ -380,6 +469,10 @@ const files = {
   },
   "icons/opera.svg": {
     content: encode(svgs["opera.svg"], BASE64),
+    encoding: BASE64
+  },
+  "icons/pokemon.svg": {
+    content: encode(svgs["pokemon.svg"], BASE64),
     encoding: BASE64
   },
   "icons/postman.svg": {

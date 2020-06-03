@@ -11,6 +11,11 @@
             "source": "https://about.500px.com/press"
         },
         {
+            "title": "ACM",
+            "hex": "0085CA",
+            "source": "http://identitystandards.acm.org/"
+        },
+        {
             "title": "AddThis",
             "hex": "FF6550",
             "source": "http://www.addthis.com/"
@@ -49,6 +54,11 @@
             "title": "Opera",
             "hex": "FF1B2D",
             "source": "https://github.com/operasoftware/logo"
+        },
+        {
+            "title": "Pokémon",
+            "hex": "FFCB05",
+            "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
         },
         {
             "title": "Postman",

@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const packageJson = JSON.stringify(require("../../test/fixtures/package.json"));
 const simpleIconsData = JSON.stringify(require("../../test/fixtures/simple-icons.json"));
 const svgs = require("../../test/fixtures/svgs.json");
@@ -21,83 +23,88 @@ function encode(data, encoding) {
 }
 
 const PRs = [ // https://developer.github.com/v3/pulls/#list-pull-requests
-  { // PR that was not merged
+  { //  0: PR that was not merged
     number: 500,
     merged_at: null,
     base: { ref: "develop" }
   },
-  { // PR that adds a file
+  { //  1: PR that adds a file
     number: 501,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies an SVG
+  { //  2: PR that modifies an SVG
     number: 502,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that was merged before the previous release
+  { //  3: PR that was merged before the previous release
     number: 498,
     merged_at: "2011-01-01T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies one icon's color
+  { //  4: PR that modifies one icon's color
     number: 503,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies one icon's source
+  { //  5: PR that modifies one icon's source
     number: 504,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies one icon's color and source
+  { //  6: PR that modifies one icon's color and source
     number: 505,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies an SVG and modifies that icon's color
+  { //  7: PR that modifies an SVG and modifies that icon's color
     number: 506,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies an SVG and modifies that icon's source
+  { //  8: PR that modifies an SVG and modifies that icon's source
     number: 507,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that modifies an SVG and modifies that icon's color and source
+  { //  9: PR that modifies an SVG and modifies that icon's color and source
     number: 508,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that adds an SVG and modifies another icon's color and source
+  { // 10: PR that adds an SVG and modifies another icon's color and source
     number: 509,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that adds an SVG and modifies another SVG
+  { // 11: PR that adds an SVG and modifies another SVG
     number: 510,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that changes the data file but no metadata
+  { // 12: PR that changes the data file but no metadata
     number: 511,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that adds a brand with a lowercased name
+  { // 13: PR that adds a brand with a lowercased name
     number: 512,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that adds ACM (which should be listed before the lowercased brand)
+  { // 14: PR that adds ACM (which should be listed before the lowercased brand)
     number: 513,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
-  { // PR that adds a brand with an accented name
+  { // 15: PR that adds a brand with an accented name
     number: 514,
+    merged_at: "2011-01-26T19:01:12Z",
+    base: { ref: "develop" }
+  },
+  { // 16: PR that removes an icon
+    number: 515,
     merged_at: "2011-01-26T19:01:12Z",
     base: { ref: "develop" }
   },
@@ -414,7 +421,29 @@ const prFiles = {
 +           "title": "Pokémon",
 +           "hex": "FFCB05",
 +           "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
-+       },
++        },
+         {
+             "title": "Poly",
+             "hex": "EB3C00",`
+    }
+  ],
+  "515": [
+    {
+      filename: "icons/foobar.svg",
+      status: STATUS_REMOVED,
+      patch: "-" + svgs["foo.svg"]
+    },
+    {
+      filename: SI_DATA_FILE,
+      status: STATUS_MODIFIED,
+      patch: `"hex": "F43E37",
+             "source": "https://blog.pocketcasts.com/press/"
+         },
+-        {
+-           "title": "foobar",
+-           "hex": "FFCB05",
+-           "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+-        },
          {
              "title": "Poly",
              "hex": "EB3C00",`
@@ -485,6 +514,77 @@ const files = {
   }
 };
 
+const defaultClient = {
+  git: {
+    getRef: function () {
+      return {
+        data: {
+          object: { sha: "820034babcbc54629dc760f9ecd36633a9f5a64a" }
+        }
+      };
+    },
+    getCommit: function () {
+      return {
+        data: {
+          sha: "7be9878fcf5392448a6fa73a7b666f4096b228bf",
+          tree: { sha: "70fed4e8a7f601ccbe3cf5b5371689be0c444573" }
+        }
+      };
+    },
+    createBlob: function () {
+      return { data: { sha: "7c1a3035afa82d1146e576135c719b57352d1dda" } };
+    },
+    createTree: function () {
+      return { data: { sha: "156b0ea79132fd85ea82119aa7bd724084bd3b82" } };
+    },
+    createCommit: function () {
+      return { data: { sha: "bfdfaf45e31a6c75d0d03b364559e3483d43befa" } };
+    },
+    updateRef: function () {
+      return;
+    }
+  },
+  issues: {
+    addLabels: function () {
+      return;
+    }
+  },
+  pulls: {
+    create: function () {
+      return { data: { number: 42 } };
+    },
+    list: function (args) {
+      const page = args.page - 1, perPage = args.per_page;
+      return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
+    },
+    listFiles: function (args) {
+      const prNumber = args.pull_number;
+      return { data: prFiles[prNumber] };
+    }
+  },
+  repos: {
+    getContents: function (args) {
+      const path = args.path;
+      return { data: files[path] };
+    }
+  }
+};
+
+const patchReleaseClient = _.cloneDeep(defaultClient);
+patchReleaseClient.pulls.list = function() {
+  return { data: [PRs[4]] };
+}
+
+const minorReleaseClient = _.cloneDeep(defaultClient);
+minorReleaseClient.pulls.list = function () {
+  return { data: [PRs[1]] };
+}
+
+const majorReleaseClient = _.cloneDeep(defaultClient);
+majorReleaseClient.pulls.list = function () {
+  return { data: [PRs[16]] };
+}
+
 module.exports = {
   context: {
     repo: {
@@ -493,57 +593,16 @@ module.exports = {
     }
   },
 
-  GitHub: function(_) {
-    return {
-      git: {
-        getRef: function() {
-          return { data: {
-            object: { sha: "820034babcbc54629dc760f9ecd36633a9f5a64a" }
-          } };
-        },
-        getCommit: function() {
-          return { data: {
-            sha: "7be9878fcf5392448a6fa73a7b666f4096b228bf",
-            tree: { sha: "70fed4e8a7f601ccbe3cf5b5371689be0c444573" }
-          } };
-        },
-        createBlob: function() {
-          return { data: { sha: "7c1a3035afa82d1146e576135c719b57352d1dda" } };
-        },
-        createTree: function() {
-          return { data: { sha: "156b0ea79132fd85ea82119aa7bd724084bd3b82" } };
-        },
-        createCommit: function() {
-          return { data: { sha: "bfdfaf45e31a6c75d0d03b364559e3483d43befa" } };
-        },
-        updateRef: function() {
-          return;
-        }
-      },
-      issues: {
-        addLabels: function() {
-          return;
-        }
-      },
-      pulls: {
-        create: function() {
-          return { data: { number: 42 } };
-        },
-        list: function(args) {
-          const page = args.page - 1, perPage = args.per_page;
-          return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
-        },
-        listFiles: function(args) {
-          const prNumber = args.pull_number;
-          return { data: prFiles[prNumber] };
-        }
-      },
-      repos: {
-        getContents: function(args) {
-          const path = args.path;
-          return { data: files[path] };
-        }
-      }
-    };
-  }
+  GitHub: function(token) {
+    switch (token) {
+      case "patch":
+        return patchReleaseClient;
+      case "minor":
+        return minorReleaseClient;
+      case "major":
+        return majorReleaseClient;
+      default:
+        return defaultClient
+    }
+  },
 }

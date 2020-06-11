@@ -3,7 +3,6 @@ const github = require("@actions/github");
 const alphaSort = require("alpha-sort");
 const moment = require("moment");
 const semverInc = require("semver/functions/inc");
-const sortBy = require("lodash.sortby");
 
 const BASE64 = "base64";
 const UTF8 = "utf-8";
@@ -37,6 +36,7 @@ const COMMIT_TYPE_BLOB = "blob";
 
 const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
 const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
+const JSON_REMOVE_EXPR = /-\s+"title":\s*"(.*)"/g;
 
 
 // Helper functions
@@ -277,7 +277,7 @@ async function getFilesSinceLastRelease(client) {
 
     if (prs.length < perPage) {
       // No Pull Requests left, break endless loop
-      return [];
+      return files;
     }
 
     page += 1;
@@ -331,6 +331,17 @@ function getChangesFromFile(file, id) {
       changes.push({
         id: id + name,
         changeType: CHANGE_TYPE_UPDATE,
+        name: name,
+        prNumbers: [file.prNumber],
+      });
+    }
+
+    const sourceRemovals = [...file.patch.matchAll(JSON_REMOVE_EXPR)];
+    for (let sourceRemoval of sourceRemovals) {
+      const name = sourceRemoval[1];
+      changes.push({
+        id: id + name,
+        changeType: CHANGE_TYPE_REMOVED,
         name: name,
         prNumbers: [file.prNumber],
       });
@@ -512,7 +523,6 @@ async function versionBump(client, newVersion) {
   packageLockJson.version = newVersion;
   const updatedPackageLockJson = JSON.stringify(packageLockJson, null, 2);
 
-  // TODO Commit the files
   core.debug("Committing version bump...");
   await commitFiles(client, "version bump", [
     { path: PACKAGE_FILE, data: updatedPackageJson },
@@ -521,11 +531,7 @@ async function versionBump(client, newVersion) {
   core.debug("Version bump committed...");
 }
 
-
-async function main() {
-  const token = core.getInput("repo-token", { required: true });
-  const client = new github.GitHub(token);
-
+async function getChanges(client) {
   let newIcons = [], updatedIcons = [], removedIcons = [], i = 0;
 
   const files = await getFilesSinceLastRelease(client);
@@ -544,12 +550,18 @@ async function main() {
     }
   }
 
+  return filterDuplicates(newIcons, updatedIcons, removedIcons);
+}
+
+async function main() {
+  const token = core.getInput("repo-token", { required: true });
+  const client = new github.GitHub(token);
+
+  const [newIcons, updatedIcons, removedIcons] = await getChanges(client);
   if (newIcons.length === 0 && updatedIcons.length === 0 && removedIcons.length === 0) {
     core.info("No notable changes detected");
     return;
   }
-
-  [newIcons, updatedIcons, removedIcons] = filterDuplicates(newIcons, updatedIcons, removedIcons);
 
   const newVersion = await getNextVersionNumber(client, { added: newIcons, modified: updatedIcons, removed: removedIcons });
   const releaseTitle = createReleaseTitle(newIcons, updatedIcons, removedIcons);
@@ -561,4 +573,11 @@ async function main() {
 
 main();
 
-module.exports = main;
+module.exports = {
+  run: main,
+
+  getChanges: getChanges,
+  getNextVersionNumber: getNextVersionNumber,
+  createReleaseTitle: createReleaseTitle,
+  createReleaseNotes: createReleaseNotes,
+};

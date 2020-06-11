@@ -423,7 +423,7 @@ async function getNextVersionNumber(client, changes) {
     releaseType = RELEASE_MAJOR;
   }
 
-  const packageJsonFile = await getPrFile(client, PACKAGE_FILE, REF_DEVELOP);
+  const packageJsonFile = await getPrFile(client, PACKAGE_FILE, REF_MASTER);
   const packageJson = JSON.parse(packageJsonFile);
 
   const newVersion = semverInc(packageJson.version, releaseType);
@@ -511,9 +511,14 @@ async function createReleasePr(client, title, body) {
 }
 
 async function versionBump(client, newVersion) {
-  core.debug(`bumping version in ${PACKAGE_FILE}`);
   const packageJsonFile = await getPrFile(client, PACKAGE_FILE, REF_DEVELOP);
   const packageJson = JSON.parse(packageJsonFile);
+  if (packageJson.version === newVersion) {
+    core.debug(`version in package.json already updated`);
+    return;
+  }
+
+  core.debug(`bumping version in ${PACKAGE_FILE}`);
   packageJson.version = newVersion;
   const updatedPackageJson = JSON.stringify(packageJson, null, 2);
 

@@ -4,6 +4,8 @@ const alphaSort = require("alpha-sort");
 const moment = require("moment");
 const semverInc = require("semver/functions/inc");
 
+const mergeOnApprove = require("./merge");
+
 const BASE64 = "base64";
 const UTF8 = "utf-8";
 
@@ -465,9 +467,10 @@ function createReleaseTitle(newIcons, updatedIcons, removedIcons) {
 function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   const sortAlphabetically = (a, b) => alphaSort.caseInsensitiveAscending(a.name, b.name);
 
-  let releaseNotes = "_this Pull Request was automatically generated_\n\n";
-  releaseNotes += `The new version will be: **v${newVersion}**\n`;
+  let releaseHeader = "_this Pull Request was automatically generated_\n\n";
+  releaseHeader += `The new version will be: **v${newVersion}**\n`;
 
+  releaseNotes = '';
   if (newIcons.length > 0) {
     releaseNotes += "\n# New Icons\n\n";
     for (let newIcon of newIcons.sort(sortAlphabetically)) {
@@ -492,7 +495,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     }
   }
 
-  return releaseNotes;
+  return releaseHeader + releaseNotes;
 }
 
 async function createReleasePr(client, title, body) {
@@ -558,10 +561,7 @@ async function getChanges(client) {
   return filterDuplicates(newIcons, updatedIcons, removedIcons);
 }
 
-async function main() {
-  const token = core.getInput("repo-token", { required: true });
-  const client = new github.GitHub(token);
-
+async function makeRelease(client) {
   const [newIcons, updatedIcons, removedIcons] = await getChanges(client);
   if (newIcons.length === 0 && updatedIcons.length === 0 && removedIcons.length === 0) {
     core.info("No notable changes detected");
@@ -575,6 +575,31 @@ async function main() {
   await createReleasePr(client, releaseTitle, releaseNotes);
   await versionBump(client, newVersion);
 }
+
+async function main() {
+  const PULL_REQUEST_REVIEW = "pull_request_review";
+  const SCHEDULE = "schedule";
+
+  const event = github.context.eventName
+
+  const token = core.getInput("repo-token", { required: true });
+  const client = new github.GitHub(token);
+
+  switch (event) {
+    case 'pull_request': // for testing
+    case SCHEDULE:
+      core.info('Scheduled run; creating release PR');
+      await makeRelease(client);
+      break;
+    case PULL_REQUEST_REVIEW:
+      core.info('PR review detected; checking if release PR should be merged');
+      await mergeOnApprove(client);
+      break;
+    default:
+      core.error(`Event '${event}' not supported by release action`);
+  }
+}
+
 
 main();
 

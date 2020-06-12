@@ -560,7 +560,8 @@ const defaultClient = {
     listFiles: function (args) {
       const prNumber = args.pull_number;
       return { data: prFiles[prNumber] };
-    }
+    },
+    merge: jest.fn().mockName("github.pulls.merge")
   },
   repos: {
     getContents: function (args) {
@@ -587,6 +588,7 @@ majorReleaseClient.pulls.list = function () {
 
 module.exports = {
   context: {
+    eventName: 'schedule',
     repo: {
       owner: "simple-icons",
       repo: "simple-icons"

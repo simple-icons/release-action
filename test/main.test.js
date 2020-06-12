@@ -1,5 +1,5 @@
-const github = require('../__mocks__/@actions/github')
-const main = require('../src/main');
+const github = require("../__mocks__/@actions/github");
+const main = require("../src/main");
 
 
 const client = new github.GitHub("token");

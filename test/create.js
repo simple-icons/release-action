@@ -1,5 +1,5 @@
 const github = require("../__mocks__/@actions/github");
-const main = require("../src/main");
+const main = require("../src/create");
 
 
 const client = new github.GitHub("token");
@@ -36,7 +36,7 @@ The new version will be: **v2.0.0**
 
 test('run action - no errors', async () => {
   expect.assertions(1);
-  await expect(main.run()).resolves.not.toBeDefined();
+  await expect(main()).resolves.not.toBeDefined();
 });
 
 test.each([

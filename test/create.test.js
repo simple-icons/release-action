@@ -1,5 +1,5 @@
 const github = require("../__mocks__/@actions/github");
-const main = require("../src/main");
+const makeRelease = require("../src/create");
 
 
 const client = new github.GitHub("token");
@@ -36,7 +36,7 @@ The new version will be: **v2.0.0**
 
 test('run action - no errors', async () => {
   expect.assertions(1);
-  await expect(main.run()).resolves.not.toBeDefined();
+  await expect(makeRelease(client)).resolves.not.toBeDefined();
 });
 
 test.each([
@@ -47,8 +47,8 @@ test.each([
   expect.assertions(1);
 
   const _client = github.GitHub(token);
-  const [newIcons, updatedIcons, removedIcons] = await main.getChanges(_client);
-  const newVersion = await main.getNextVersionNumber(client, {
+  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(_client);
+  const newVersion = await makeRelease.getNextVersionNumber(client, {
     added: newIcons,
     modified: updatedIcons,
     removed: removedIcons,
@@ -60,8 +60,8 @@ test.each([
 test('correct release title', async () => {
   expect.assertions(1);
 
-  const [newIcons, updatedIcons, removedIcons] = await main.getChanges(client);
-  const releaseTitle = main.createReleaseTitle(newIcons, updatedIcons, removedIcons);
+  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(client);
+  const releaseTitle = makeRelease.createReleaseTitle(newIcons, updatedIcons, removedIcons);
 
   expectedTitle = "Publish 6 new icons and 9 updated icons and 1 removed icon";
   expect(releaseTitle).toBe(expectedTitle);
@@ -70,13 +70,13 @@ test('correct release title', async () => {
 test('correct release notes', async () => {
   expect.assertions(1);
 
-  const [newIcons, updatedIcons, removedIcons] = await main.getChanges(client);
-  const newVersion = await main.getNextVersionNumber(client, {
+  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(client);
+  const newVersion = await makeRelease.getNextVersionNumber(client, {
     added: newIcons,
     modified: updatedIcons,
     removed: removedIcons,
   });
-  const releaseNotes = main.createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons);
+  const releaseNotes = makeRelease.createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons);
 
   expect(releaseNotes).toBe(expectedNotes);
 });

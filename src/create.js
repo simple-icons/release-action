@@ -497,18 +497,18 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
 }
 
 async function createReleasePr(client, title, body) {
-  core.debug("\n Creating PR for release:");
-  core.debug("PR title:");
-  core.debug(title);
+  core.info("\n Creating PR for release:");
+  core.info("PR title:");
+  core.info(`   ${title}`);
   core.debug("\nPR body:");
   core.debug(body);
 
   const prNumber = await createPullRequest(client, title, body, BRANCH_DEVELOP, BRANCH_MASTER);
-  core.debug(`\nNew release PR is: ${prNumber}`);
+  core.info(`\nNew release PR is: ${prNumber}`);
 
-  core.debug(`Adding label '${RELEASE_LABEL}' to PR ${prNumber}`);
+  core.info(`Adding label '${RELEASE_LABEL}' to PR ${prNumber}`);
   await addLabels(client, prNumber, [RELEASE_LABEL]);
-  core.debug(`Added the '${RELEASE_LABEL}' label to PR ${prNumber}`);
+  core.info(`Added the '${RELEASE_LABEL}' label to PR ${prNumber}`);
 }
 
 async function versionBump(client, newVersion) {
@@ -519,22 +519,22 @@ async function versionBump(client, newVersion) {
     return;
   }
 
-  core.debug(`bumping version in ${PACKAGE_FILE}`);
+  core.info(`bumping version in ${PACKAGE_FILE}`);
   packageJson.version = newVersion;
   const updatedPackageJson = JSON.stringify(packageJson, null, 2);
 
-  core.debug(`bumping version in ${PACKAGE_LOCK_FILE}`);
+  core.info(`bumping version in ${PACKAGE_LOCK_FILE}`);
   const packageLockJsonFile = await getPrFile(client, PACKAGE_LOCK_FILE, REF_DEVELOP);
   const packageLockJson = JSON.parse(packageLockJsonFile);
   packageLockJson.version = newVersion;
   const updatedPackageLockJson = JSON.stringify(packageLockJson, null, 2);
 
-  core.debug("Committing version bump...");
+  core.info("Committing version bump...");
   await commitFiles(client, "version bump", [
     { path: PACKAGE_FILE, data: updatedPackageJson },
     { path: PACKAGE_LOCK_FILE, data: updatedPackageLockJson },
   ]);
-  core.debug("Version bump committed...");
+  core.info("Version bump committed.");
 }
 
 async function getChanges(client) {

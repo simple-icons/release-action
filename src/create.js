@@ -521,13 +521,19 @@ async function versionBump(client, newVersion) {
 
   core.info(`bumping version in ${PACKAGE_FILE}`);
   packageJson.version = newVersion;
-  const updatedPackageJson = JSON.stringify(packageJson, null, 2);
+  let updatedPackageJson = JSON.stringify(packageJson, null, 2);
+  if (!updatedPackageJson.endsWith('\n')) {
+    updatedPackageJson += '\n';
+  }
 
   core.info(`bumping version in ${PACKAGE_LOCK_FILE}`);
   const packageLockJsonFile = await getPrFile(client, PACKAGE_LOCK_FILE, REF_DEVELOP);
   const packageLockJson = JSON.parse(packageLockJsonFile);
   packageLockJson.version = newVersion;
-  const updatedPackageLockJson = JSON.stringify(packageLockJson, null, 2);
+  let updatedPackageLockJson = JSON.stringify(packageLockJson, null, 2);
+  if (!updatedPackageLockJson.endsWith('\n')) {
+    updatedPackageLockJson += '\n';
+  }
 
   core.info("Committing version bump...");
   await commitFiles(client, "version bump", [

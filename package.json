@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "ncc build src/main.js -m -o lib",
-    "postinstall": "husky install",
+    "postinstall": "is-ci || husky install",
     "test": "jest"
   },
   "dependencies": {
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@zeit/ncc": "^0.22.1",
     "husky": "^5.0.6",
+    "is-ci": "^2.0.0",
     "lodash": "^4.17.19"
   },
   "engines": {

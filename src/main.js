@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const makeRelease = require("./create");
+const {makeRelease} = require("./create");
 const mergeOnApprove = require("./merge");
 
 
@@ -29,6 +29,8 @@ async function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
 
 module.exports = main;

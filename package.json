@@ -10,7 +10,7 @@
     "email": "ericornelissen@gmail.com"
   },
   "scripts": {
-    "build": "ncc build src/main.js -m -o lib",
+    "build": "ncc build src/index.js -m -o lib",
     "postinstall": "is-ci || husky install",
     "test": "jest"
   },

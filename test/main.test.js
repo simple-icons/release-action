@@ -1,7 +1,7 @@
 const github = require("../__mocks__/@actions/github");
 const main = require("../src/main");
 
-jest.mock("../src/create", () => ({ makeRelease: jest.fn() }));
+jest.mock("../src/create", () => jest.fn());
 jest.mock("../src/merge", () => jest.fn());
 
 const createMock = require("../src/create");
@@ -9,7 +9,7 @@ const mergeMock = require("../src/merge");
 
 
 beforeAll(() => {
-  createMock.makeRelease.mockClear();
+  createMock.mockClear();
   mergeMock.mockClear();
 });
 
@@ -18,7 +18,7 @@ test('event "schedule"', async () => {
 
   github.context.eventName = "schedule";
   await main();
-  expect(createMock.makeRelease).toHaveBeenCalledTimes(1);
+  expect(createMock).toHaveBeenCalledTimes(1);
 });
 
 test('event "pull_request_review"', async () => {

@@ -1,11 +1,5 @@
 const github = require("../__mocks__/@actions/github");
-const {
-  makeRelease,
-  getChanges,
-  getNextVersionNumber,
-  createReleaseTitle,
-  createReleaseNotes
-} = require("../src/create");
+const makeRelease = require("../src/create");
 
 
 const client = new github.GitHub("token");
@@ -53,8 +47,8 @@ test.each([
   expect.assertions(1);
 
   const _client = github.GitHub(token);
-  const [newIcons, updatedIcons, removedIcons] = await getChanges(_client);
-  const newVersion = await getNextVersionNumber(client, {
+  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(_client);
+  const newVersion = await makeRelease.getNextVersionNumber(client, {
     added: newIcons,
     modified: updatedIcons,
     removed: removedIcons,
@@ -66,8 +60,8 @@ test.each([
 test('correct release title', async () => {
   expect.assertions(1);
 
-  const [newIcons, updatedIcons, removedIcons] = await getChanges(client);
-  const releaseTitle = createReleaseTitle(newIcons, updatedIcons, removedIcons);
+  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(client);
+  const releaseTitle = makeRelease.createReleaseTitle(newIcons, updatedIcons, removedIcons);
 
   expectedTitle = "Publish 6 new icons and 9 updated icons and 1 removed icon";
   expect(releaseTitle).toBe(expectedTitle);
@@ -76,13 +70,13 @@ test('correct release title', async () => {
 test('correct release notes', async () => {
   expect.assertions(1);
 
-  const [newIcons, updatedIcons, removedIcons] = await getChanges(client);
-  const newVersion = await getNextVersionNumber(client, {
+  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(client);
+  const newVersion = await makeRelease.getNextVersionNumber(client, {
     added: newIcons,
     modified: updatedIcons,
     removed: removedIcons,
   });
-  const releaseNotes = createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons);
+  const releaseNotes = makeRelease.createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons);
 
   expect(releaseNotes).toBe(expectedNotes);
 });

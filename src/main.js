@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const {makeRelease} = require("./create");
+const makeRelease = require("./create");
 const mergeOnApprove = require("./merge");
 
 
@@ -27,10 +27,6 @@ async function main() {
     default:
       core.error(`Event '${event}' not supported by the release action`);
   }
-}
-
-if (require.main === module) {
-  main();
 }
 
 module.exports = main;

@@ -4,13 +4,13 @@
   "private": true,
   "description": "Release Action for Simple Icons",
   "license": "CC0-1.0",
-  "main": "src/main.js",
+  "main": "src/index.js",
   "author": {
     "name": "Eric Cornelissen",
     "email": "ericornelissen@gmail.com"
   },
   "scripts": {
-    "build": "ncc build src/main.js -m -o lib",
+    "build": "ncc build src/index.js -m -o lib",
     "postinstall": "is-ci || husky install",
     "test": "jest"
   },

@@ -34,6 +34,10 @@ The new version will be: **v2.0.0**
 `;
 
 
+beforeEach(() => {
+  client.pulls.create.mockClear();
+});
+
 test('run action - no errors', async () => {
   expect.assertions(1);
   await expect(makeRelease(client)).resolves.not.toBeDefined();
@@ -47,36 +51,85 @@ test.each([
   expect.assertions(1);
 
   const _client = github.GitHub(token);
-  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(_client);
-  const newVersion = await makeRelease.getNextVersionNumber(client, {
-    added: newIcons,
-    modified: updatedIcons,
-    removed: removedIcons,
-  });
+  await makeRelease(_client);
 
-  expect(newVersion).toBe(expectedVersion);
+  expect(_client.pulls.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      owner: expect.any(String),
+      repo: expect.any(String),
+      title: expect.any(String),
+      body: expect.stringContaining(`The new version will be: **v${expectedVersion}**`),
+      head: expect.any(String),
+      base: expect.any(String),
+    }),
+  );
 });
 
-test('correct release title', async () => {
+test.each([
+  [
+    "patch",
+    "Publish 1 updated icon",
+  ],
+  [
+    "add-and-update",
+    "Publish 2 new icons and 1 updated icon",
+  ],
+  [
+    "add-and-remove",
+    "Publish 2 new icons and 1 removed icon",
+  ],
+  [
+    "add-remove-and-update",
+    "Publish 2 new icons and 1 updated icon and 1 removed icon",
+  ],
+])('correct release title (%s)', async (token, expectedTitle) => {
   expect.assertions(1);
 
-  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(client);
-  const releaseTitle = makeRelease.createReleaseTitle(newIcons, updatedIcons, removedIcons);
+  const _client = github.GitHub(token);
+  await makeRelease(_client);
 
-  expectedTitle = "Publish 6 new icons and 9 updated icons and 1 removed icon";
-  expect(releaseTitle).toBe(expectedTitle);
+  expect(_client.pulls.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      owner: expect.any(String),
+      repo: expect.any(String),
+      title: expectedTitle,
+      body: expect.any(String),
+      head: expect.any(String),
+      base: expect.any(String),
+    }),
+  );
 });
 
 test('correct release notes', async () => {
   expect.assertions(1);
 
-  const [newIcons, updatedIcons, removedIcons] = await makeRelease.getChanges(client);
-  const newVersion = await makeRelease.getNextVersionNumber(client, {
-    added: newIcons,
-    modified: updatedIcons,
-    removed: removedIcons,
-  });
-  const releaseNotes = makeRelease.createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons);
+  await makeRelease(client);
 
-  expect(releaseNotes).toBe(expectedNotes);
+  expect(client.pulls.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      owner: expect.any(String),
+      repo: expect.any(String),
+      title: expect.any(String),
+      body: expectedNotes,
+      head: expect.any(String),
+      base: expect.any(String),
+    }),
+  );
+});
+
+test('correct Pull Request settings', async () => {
+  expect.assertions(1);
+
+  await makeRelease(client);
+
+  expect(client.pulls.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      title: expect.any(String),
+      body: expect.any(String),
+      head: "develop",
+      base: "master",
+    }),
+  );
 });

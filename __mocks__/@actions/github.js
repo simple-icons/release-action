@@ -448,7 +448,7 @@ const prFiles = {
              "title": "Poly",
              "hex": "EB3C00",`
     }
-  ]
+  ],
 };
 
 const files = {
@@ -511,88 +511,144 @@ const files = {
   "icons/wordpress.svg": {
     content: encode(svgs["wordpress.svg"], BASE64),
     encoding: BASE64
-  }
+  },
 };
 
 const defaultClient = {
   git: {
-    getRef: function () {
-      return {
-        data: {
-          object: { sha: "820034babcbc54629dc760f9ecd36633a9f5a64a" }
-        }
-      };
-    },
-    getCommit: function () {
-      return {
-        data: {
-          sha: "7be9878fcf5392448a6fa73a7b666f4096b228bf",
-          tree: { sha: "70fed4e8a7f601ccbe3cf5b5371689be0c444573" }
-        }
-      };
-    },
-    createBlob: function () {
-      return { data: { sha: "7c1a3035afa82d1146e576135c719b57352d1dda" } };
-    },
-    createTree: function () {
-      return { data: { sha: "156b0ea79132fd85ea82119aa7bd724084bd3b82" } };
-    },
-    createCommit: function () {
-      return { data: { sha: "bfdfaf45e31a6c75d0d03b364559e3483d43befa" } };
-    },
-    updateRef: function () {
-      return;
-    }
+    getRef: jest.fn()
+      .mockName("github.git.getRef")
+      .mockImplementation(() => {
+        return {
+          data: {
+            object: { sha: "820034babcbc54629dc760f9ecd36633a9f5a64a" }
+          }
+        };
+      }),
+    getCommit: jest.fn()
+      .mockName("github.git.getCommit")
+      .mockImplementation(() =>{
+        return {
+          data: {
+            sha: "7be9878fcf5392448a6fa73a7b666f4096b228bf",
+            tree: { sha: "70fed4e8a7f601ccbe3cf5b5371689be0c444573" }
+          }
+        };
+      }),
+    createBlob: jest.fn()
+      .mockName("github.git.createBlob")
+      .mockImplementation(() => {
+        return { data: { sha: "7c1a3035afa82d1146e576135c719b57352d1dda" } };
+      }),
+    createTree: jest.fn()
+      .mockName("github.git.createTree")
+      .mockImplementation(() => {
+        return { data: { sha: "156b0ea79132fd85ea82119aa7bd724084bd3b82" } };
+      }),
+    createCommit: jest.fn()
+      .mockName("github.git.createCommit")
+      .mockImplementation(() => {
+        return { data: { sha: "bfdfaf45e31a6c75d0d03b364559e3483d43befa" } };
+      }),
+    updateRef: jest.fn()
+      .mockName("github.git.updateRef")
+      .mockImplementation(() => {
+        return;
+      }),
   },
   issues: {
-    addLabels: function () {
-      return;
-    }
+    addLabels: jest.fn()
+      .mockName("github.issues.addLabels")
+      .mockImplementation(() => {
+        return;
+      }),
   },
   pulls: {
-    create: function () {
-      return { data: { number: 42 } };
-    },
-    list: function (args) {
-      const page = args.page - 1, perPage = args.per_page;
-      return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
-    },
-    listFiles: function (args) {
-      const prNumber = args.pull_number;
-      return { data: prFiles[prNumber] };
-    },
-    merge: jest.fn().mockName("github.pulls.merge")
+    create: jest.fn()
+      .mockName("github.pulls.create")
+      .mockImplementation(() => {
+        return { data: { number: 42 } };
+      }),
+    list: jest.fn()
+      .mockName("github.pulls.list")
+      .mockImplementation((args) => {
+        const page = args.page - 1, perPage = args.per_page;
+        return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
+      }),
+    listFiles: jest.fn()
+      .mockName("github.pulls.listFiles")
+      .mockImplementation((args) => {
+        const prNumber = args.pull_number;
+        return { data: prFiles[prNumber] };
+      }),
+    merge: jest.fn().mockName("github.pulls.merge"),
   },
   repos: {
-    getContents: function (args) {
-      const path = args.path;
-      return { data: files[path] };
-    }
-  }
+    getContents: jest.fn()
+      .mockName("github.repos.getContent")
+      .mockImplementation((args) => {
+        const path = args.path;
+        return { data: files[path] };
+      }),
+  },
 };
 
 const patchReleaseClient = _.cloneDeep(defaultClient);
-patchReleaseClient.pulls.list = function() {
+patchReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[4]] };
-}
+});
 
 const minorReleaseClient = _.cloneDeep(defaultClient);
-minorReleaseClient.pulls.list = function () {
+minorReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[1]] };
-}
+});
 
 const majorReleaseClient = _.cloneDeep(defaultClient);
-majorReleaseClient.pulls.list = function () {
+majorReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[16]] };
-}
+});
+
+const addAndUpdateReleaseClient = _.cloneDeep(defaultClient);
+addAndUpdateReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+  return {
+    data: [
+      PRs[1],
+      PRs[2],
+      PRs[14],
+    ],
+  };
+});
+
+const addAndRemoveReleaseClient = _.cloneDeep(defaultClient);
+addAndRemoveReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+  return {
+    data: [
+      PRs[1],
+      PRs[14],
+      PRs[16],
+    ],
+  };
+});
+
+const addRemoveAndUpdateReleaseClient = _.cloneDeep(defaultClient);
+addRemoveAndUpdateReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+  return {
+    data: [
+      PRs[1],
+      PRs[2],
+      PRs[14],
+      PRs[16],
+    ],
+  };
+});
 
 module.exports = {
   context: {
     eventName: 'schedule',
     repo: {
       owner: "simple-icons",
-      repo: "simple-icons"
-    }
+      repo: "simple-icons",
+    },
   },
 
   GitHub: function(token) {
@@ -603,8 +659,14 @@ module.exports = {
         return minorReleaseClient;
       case "major":
         return majorReleaseClient;
+      case "add-and-update":
+        return addAndUpdateReleaseClient;
+      case "add-and-remove":
+        return addAndRemoveReleaseClient;
+      case "add-remove-and-update":
+        return addRemoveAndUpdateReleaseClient;
       default:
-        return defaultClient
+        return defaultClient;
     }
   },
 }

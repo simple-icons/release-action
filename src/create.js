@@ -580,9 +580,4 @@ async function makeRelease(client) {
   await versionBump(client, newVersion);
 }
 
-makeRelease.getChanges = getChanges;
-makeRelease.getNextVersionNumber = getNextVersionNumber;
-makeRelease.createReleaseTitle = createReleaseTitle;
-makeRelease.createReleaseNotes = createReleaseNotes;
-
 module.exports = makeRelease;

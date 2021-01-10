@@ -1,17 +1,19 @@
-const _ = require("lodash");
+const _ = require('lodash');
 
-const packageJson = JSON.stringify(require("../../test/fixtures/package.json"));
-const simpleIconsData = JSON.stringify(require("../../test/fixtures/simple-icons.json"));
-const svgs = require("../../test/fixtures/svgs.json");
+const packageJson = JSON.stringify(require('../../test/fixtures/package.json'));
+const simpleIconsData = JSON.stringify(
+  require('../../test/fixtures/simple-icons.json')
+);
+const svgs = require('../../test/fixtures/svgs.json');
 
-const BASE64 = "base64";
-const UTF8 = "utf-8";
+const BASE64 = 'base64';
+const UTF8 = 'utf-8';
 
-const SI_DATA_FILE = "_data/simple-icons.json";
+const SI_DATA_FILE = '_data/simple-icons.json';
 
-const STATUS_ADDED = "added";
-const STATUS_MODIFIED = "modified";
-const STATUS_REMOVED = "removed";
+const STATUS_ADDED = 'added';
+const STATUS_MODIFIED = 'modified';
+const STATUS_REMOVED = 'removed';
 
 function encode(data, encoding) {
   if (encoding === BASE64) {
@@ -22,114 +24,132 @@ function encode(data, encoding) {
   }
 }
 
-const PRs = [ // https://developer.github.com/v3/pulls/#list-pull-requests
-  { //  0: PR that was not merged
+const PRs = [
+  // https://developer.github.com/v3/pulls/#list-pull-requests
+  {
+    //  0: PR that was not merged
     number: 500,
     merged_at: null,
-    base: { ref: "develop" }
+    base: { ref: 'develop' },
   },
-  { //  1: PR that adds a file
+  {
+    //  1: PR that adds a file
     number: 501,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  2: PR that modifies an SVG
+  {
+    //  2: PR that modifies an SVG
     number: 502,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  3: PR that was merged before the previous release
+  {
+    //  3: PR that was merged before the previous release
     number: 498,
-    merged_at: "2011-01-01T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-01T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  4: PR that modifies one icon's color
+  {
+    //  4: PR that modifies one icon's color
     number: 503,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  5: PR that modifies one icon's source
+  {
+    //  5: PR that modifies one icon's source
     number: 504,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  6: PR that modifies one icon's color and source
+  {
+    //  6: PR that modifies one icon's color and source
     number: 505,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  7: PR that modifies an SVG and modifies that icon's color
+  {
+    //  7: PR that modifies an SVG and modifies that icon's color
     number: 506,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  8: PR that modifies an SVG and modifies that icon's source
+  {
+    //  8: PR that modifies an SVG and modifies that icon's source
     number: 507,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { //  9: PR that modifies an SVG and modifies that icon's color and source
+  {
+    //  9: PR that modifies an SVG and modifies that icon's color and source
     number: 508,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 10: PR that adds an SVG and modifies another icon's color and source
+  {
+    // 10: PR that adds an SVG and modifies another icon's color and source
     number: 509,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 11: PR that adds an SVG and modifies another SVG
+  {
+    // 11: PR that adds an SVG and modifies another SVG
     number: 510,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 12: PR that changes the data file but no metadata
+  {
+    // 12: PR that changes the data file but no metadata
     number: 511,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 13: PR that adds a brand with a lowercased name
+  {
+    // 13: PR that adds a brand with a lowercased name
     number: 512,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 14: PR that adds ACM (which should be listed before the lowercased brand)
+  {
+    // 14: PR that adds ACM (which should be listed before the lowercased brand)
     number: 513,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 15: PR that adds a brand with an accented name
+  {
+    // 15: PR that adds a brand with an accented name
     number: 514,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
-  { // 16: PR that removes an icon
+  {
+    // 16: PR that removes an icon
     number: 515,
-    merged_at: "2011-01-26T19:01:12Z",
-    base: { ref: "develop" }
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
   },
 
-
-  { // Previous release
+  {
+    // Previous release
     number: 499,
-    merged_at: "2011-01-02T19:01:12Z",
-    base: { ref: "master" }
-  }
+    merged_at: '2011-01-02T19:01:12Z',
+    base: { ref: 'master' },
+  },
 ];
 
 const prFiles = {
-  "500": [
+  500: [
     {
-      filename: "icons/foo.svg",
+      filename: 'icons/foo.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["foo.svg"]
-    }
+      patch: '+' + svgs['foo.svg'],
+    },
   ],
-  "501": [
+  501: [
     {
-      filename: "icons/foo.svg",
+      filename: 'icons/foo.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["foo.svg"]
+      patch: '+' + svgs['foo.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -144,24 +164,24 @@ const prFiles = {
 +        },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "502": [
+  502: [
     {
-      filename: "icons/feedly.svg",
+      filename: 'icons/feedly.svg',
       status: STATUS_MODIFIED,
-      patch: "+" + svgs["feedly.svg"] + "\n-" + svgs["feedly.svg"] + "foo"
-    }
+      patch: '+' + svgs['feedly.svg'] + '\n-' + svgs['feedly.svg'] + 'foo',
+    },
   ],
-  "498": [
+  498: [
     {
-      filename: "icons/500px.svg",
+      filename: 'icons/500px.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["500px.svg"]
-    }
+      patch: '+' + svgs['500px.svg'],
+    },
   ],
-  "503": [
+  503: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
@@ -176,10 +196,10 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "504": [
+  504: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
@@ -194,10 +214,10 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "505": [
+  505: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
@@ -213,14 +233,14 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "506": [
+  506: [
     {
-      filename: "icons/postman.svg",
+      filename: 'icons/postman.svg',
       status: STATUS_MODIFIED,
-      patch: "+" + svgs["postman.svg"] + "\n-" + svgs["postman.svg"] + "bar"
+      patch: '+' + svgs['postman.svg'] + '\n-' + svgs['postman.svg'] + 'bar',
     },
     {
       filename: SI_DATA_FILE,
@@ -236,14 +256,14 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "507": [
+  507: [
     {
-      filename: "icons/intel.svg",
+      filename: 'icons/intel.svg',
       status: STATUS_MODIFIED,
-      patch: "+" + svgs["intel.svg"] + "\n-" + svgs["intel.svg"] + "bar"
+      patch: '+' + svgs['intel.svg'] + '\n-' + svgs['intel.svg'] + 'bar',
     },
     {
       filename: SI_DATA_FILE,
@@ -259,14 +279,14 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "508": [
+  508: [
     {
-      filename: "icons/addthis.svg",
+      filename: 'icons/addthis.svg',
       status: STATUS_MODIFIED,
-      patch: "+" + svgs["addthis.svg"] + "\n-" + svgs["addthis.svg"] + "bar"
+      patch: '+' + svgs['addthis.svg'] + '\n-' + svgs['addthis.svg'] + 'bar',
     },
     {
       filename: SI_DATA_FILE,
@@ -283,14 +303,14 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "509": [
+  509: [
     {
-      filename: "icons/jest.svg",
+      filename: 'icons/jest.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["jest.svg"]
+      patch: '+' + svgs['jest.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -317,19 +337,19 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "510": [
+  510: [
     {
-      filename: "icons/opera.svg",
+      filename: 'icons/opera.svg',
       status: STATUS_MODIFIED,
-      patch: "+" + svgs["opera.svg"] + "\n-" + svgs["opera.svg"] + "foobar"
+      patch: '+' + svgs['opera.svg'] + '\n-' + svgs['opera.svg'] + 'foobar',
     },
     {
-      filename: "icons/wordpress.svg",
+      filename: 'icons/wordpress.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["wordpress.svg"]
+      patch: '+' + svgs['wordpress.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -344,10 +364,10 @@ const prFiles = {
          },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "511": [
+  511: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
@@ -358,14 +378,14 @@ const prFiles = {
 -           },
             {
               "title": "React",
-              "hex": "61DAFB",`
-    }
+              "hex": "61DAFB",`,
+    },
   ],
-  "512": [
+  512: [
     {
-      filename: "icons/bar.svg",
+      filename: 'icons/bar.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["bar.svg"]
+      patch: '+' + svgs['bar.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -380,14 +400,14 @@ const prFiles = {
 +        },
          {
              "title": "Simple Icons",
-             "hex": "555555",`
-    }
+             "hex": "555555",`,
+    },
   ],
-  "513": [
+  513: [
     {
-      filename: "icons/acm.svg",
+      filename: 'icons/acm.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["acm.svg"]
+      patch: '+' + svgs['acm.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -402,14 +422,14 @@ const prFiles = {
 +        },
          {
              "title": "ActiGraph",
-             "hex": "0B2C4A",`
-    }
+             "hex": "0B2C4A",`,
+    },
   ],
-  "514": [
+  514: [
     {
-      filename: "icons/pokemon.svg",
+      filename: 'icons/pokemon.svg',
       status: STATUS_ADDED,
-      patch: "+" + svgs["pokemon.svg"]
+      patch: '+' + svgs['pokemon.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -424,14 +444,14 @@ const prFiles = {
 +        },
          {
              "title": "Poly",
-             "hex": "EB3C00",`
-    }
+             "hex": "EB3C00",`,
+    },
   ],
-  "515": [
+  515: [
     {
-      filename: "icons/foobar.svg",
+      filename: 'icons/foobar.svg',
       status: STATUS_REMOVED,
-      patch: "-" + svgs["foo.svg"]
+      patch: '-' + svgs['foo.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -446,146 +466,158 @@ const prFiles = {
 -        },
          {
              "title": "Poly",
-             "hex": "EB3C00",`
-    }
+             "hex": "EB3C00",`,
+    },
   ],
 };
 
 const files = {
-  "package.json": {
+  'package.json': {
     content: encode(packageJson, BASE64),
-    encoding: BASE64
+    encoding: BASE64,
   },
-  "package-lock.json": {
+  'package-lock.json': {
     content: encode(packageJson, BASE64),
-    encoding: BASE64
+    encoding: BASE64,
   },
-  "_data/simple-icons.json": {
+  '_data/simple-icons.json': {
     content: encode(simpleIconsData, BASE64),
-    encoding: BASE64
+    encoding: BASE64,
   },
-  "icons/500px.svg": {
-    content: encode(svgs["500px.svg"], BASE64),
-    encoding: BASE64
+  'icons/500px.svg': {
+    content: encode(svgs['500px.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/addthis.svg": {
-    content: encode(svgs["addthis.svg"], BASE64),
-    encoding: BASE64
+  'icons/addthis.svg': {
+    content: encode(svgs['addthis.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/acm.svg": {
-    content: encode(svgs["acm.svg"], BASE64),
-    encoding: BASE64
+  'icons/acm.svg': {
+    content: encode(svgs['acm.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/bar.svg": {
-    content: encode(svgs["bar.svg"], BASE64),
-    encoding: BASE64
+  'icons/bar.svg': {
+    content: encode(svgs['bar.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/feedly.svg": {
-    content: encode(svgs["feedly.svg"], BASE64),
-    encoding: BASE64
+  'icons/feedly.svg': {
+    content: encode(svgs['feedly.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/foo.svg": {
-    content: encode(svgs["foo.svg"], BASE64),
-    encoding: BASE64
+  'icons/foo.svg': {
+    content: encode(svgs['foo.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/intel.svg": {
-    content: encode(svgs["intel.svg"], BASE64),
-    encoding: BASE64
+  'icons/intel.svg': {
+    content: encode(svgs['intel.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/jest.svg": {
-    content: encode(svgs["jest.svg"], BASE64),
-    encoding: BASE64
+  'icons/jest.svg': {
+    content: encode(svgs['jest.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/opera.svg": {
-    content: encode(svgs["opera.svg"], BASE64),
-    encoding: BASE64
+  'icons/opera.svg': {
+    content: encode(svgs['opera.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/pokemon.svg": {
-    content: encode(svgs["pokemon.svg"], BASE64),
-    encoding: BASE64
+  'icons/pokemon.svg': {
+    content: encode(svgs['pokemon.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/postman.svg": {
-    content: encode(svgs["postman.svg"], BASE64),
-    encoding: BASE64
+  'icons/postman.svg': {
+    content: encode(svgs['postman.svg'], BASE64),
+    encoding: BASE64,
   },
-  "icons/wordpress.svg": {
-    content: encode(svgs["wordpress.svg"], BASE64),
-    encoding: BASE64
+  'icons/wordpress.svg': {
+    content: encode(svgs['wordpress.svg'], BASE64),
+    encoding: BASE64,
   },
 };
 
 const defaultClient = {
   git: {
-    getRef: jest.fn()
-      .mockName("github.git.getRef")
+    getRef: jest
+      .fn()
+      .mockName('github.git.getRef')
       .mockImplementation(() => {
         return {
           data: {
-            object: { sha: "820034babcbc54629dc760f9ecd36633a9f5a64a" }
-          }
+            object: { sha: '820034babcbc54629dc760f9ecd36633a9f5a64a' },
+          },
         };
       }),
-    getCommit: jest.fn()
-      .mockName("github.git.getCommit")
-      .mockImplementation(() =>{
+    getCommit: jest
+      .fn()
+      .mockName('github.git.getCommit')
+      .mockImplementation(() => {
         return {
           data: {
-            sha: "7be9878fcf5392448a6fa73a7b666f4096b228bf",
-            tree: { sha: "70fed4e8a7f601ccbe3cf5b5371689be0c444573" }
-          }
+            sha: '7be9878fcf5392448a6fa73a7b666f4096b228bf',
+            tree: { sha: '70fed4e8a7f601ccbe3cf5b5371689be0c444573' },
+          },
         };
       }),
-    createBlob: jest.fn()
-      .mockName("github.git.createBlob")
+    createBlob: jest
+      .fn()
+      .mockName('github.git.createBlob')
       .mockImplementation(() => {
-        return { data: { sha: "7c1a3035afa82d1146e576135c719b57352d1dda" } };
+        return { data: { sha: '7c1a3035afa82d1146e576135c719b57352d1dda' } };
       }),
-    createTree: jest.fn()
-      .mockName("github.git.createTree")
+    createTree: jest
+      .fn()
+      .mockName('github.git.createTree')
       .mockImplementation(() => {
-        return { data: { sha: "156b0ea79132fd85ea82119aa7bd724084bd3b82" } };
+        return { data: { sha: '156b0ea79132fd85ea82119aa7bd724084bd3b82' } };
       }),
-    createCommit: jest.fn()
-      .mockName("github.git.createCommit")
+    createCommit: jest
+      .fn()
+      .mockName('github.git.createCommit')
       .mockImplementation(() => {
-        return { data: { sha: "bfdfaf45e31a6c75d0d03b364559e3483d43befa" } };
+        return { data: { sha: 'bfdfaf45e31a6c75d0d03b364559e3483d43befa' } };
       }),
-    updateRef: jest.fn()
-      .mockName("github.git.updateRef")
+    updateRef: jest
+      .fn()
+      .mockName('github.git.updateRef')
       .mockImplementation(() => {
         return;
       }),
   },
   issues: {
-    addLabels: jest.fn()
-      .mockName("github.issues.addLabels")
+    addLabels: jest
+      .fn()
+      .mockName('github.issues.addLabels')
       .mockImplementation(() => {
         return;
       }),
   },
   pulls: {
-    create: jest.fn()
-      .mockName("github.pulls.create")
+    create: jest
+      .fn()
+      .mockName('github.pulls.create')
       .mockImplementation(() => {
         return { data: { number: 42 } };
       }),
-    list: jest.fn()
-      .mockName("github.pulls.list")
+    list: jest
+      .fn()
+      .mockName('github.pulls.list')
       .mockImplementation((args) => {
-        const page = args.page - 1, perPage = args.per_page;
+        const page = args.page - 1,
+          perPage = args.per_page;
         return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
       }),
-    listFiles: jest.fn()
-      .mockName("github.pulls.listFiles")
+    listFiles: jest
+      .fn()
+      .mockName('github.pulls.listFiles')
       .mockImplementation((args) => {
         const prNumber = args.pull_number;
         return { data: prFiles[prNumber] };
       }),
-    merge: jest.fn().mockName("github.pulls.merge"),
+    merge: jest.fn().mockName('github.pulls.merge'),
   },
   repos: {
-    getContents: jest.fn()
-      .mockName("github.repos.getContent")
+    getContents: jest
+      .fn()
+      .mockName('github.repos.getContent')
       .mockImplementation((args) => {
         const path = args.path;
         return { data: files[path] };
@@ -611,62 +643,51 @@ majorReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
 const addAndUpdateReleaseClient = _.cloneDeep(defaultClient);
 addAndUpdateReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
   return {
-    data: [
-      PRs[1],
-      PRs[2],
-      PRs[14],
-    ],
+    data: [PRs[1], PRs[2], PRs[14]],
   };
 });
 
 const addAndRemoveReleaseClient = _.cloneDeep(defaultClient);
 addAndRemoveReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
   return {
-    data: [
-      PRs[1],
-      PRs[14],
-      PRs[16],
-    ],
+    data: [PRs[1], PRs[14], PRs[16]],
   };
 });
 
 const addRemoveAndUpdateReleaseClient = _.cloneDeep(defaultClient);
-addRemoveAndUpdateReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
-  return {
-    data: [
-      PRs[1],
-      PRs[2],
-      PRs[14],
-      PRs[16],
-    ],
-  };
-});
+addRemoveAndUpdateReleaseClient.pulls.list = jest
+  .fn()
+  .mockImplementation(() => {
+    return {
+      data: [PRs[1], PRs[2], PRs[14], PRs[16]],
+    };
+  });
 
 module.exports = {
   context: {
     eventName: 'schedule',
     repo: {
-      owner: "simple-icons",
-      repo: "simple-icons",
+      owner: 'simple-icons',
+      repo: 'simple-icons',
     },
   },
 
-  GitHub: function(token) {
+  GitHub: function (token) {
     switch (token) {
-      case "patch":
+      case 'patch':
         return patchReleaseClient;
-      case "minor":
+      case 'minor':
         return minorReleaseClient;
-      case "major":
+      case 'major':
         return majorReleaseClient;
-      case "add-and-update":
+      case 'add-and-update':
         return addAndUpdateReleaseClient;
-      case "add-and-remove":
+      case 'add-and-remove':
         return addAndRemoveReleaseClient;
-      case "add-remove-and-update":
+      case 'add-remove-and-update':
         return addRemoveAndUpdateReleaseClient;
       default:
         return defaultClient;
     }
   },
-}
+};

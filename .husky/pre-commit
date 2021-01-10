@@ -2,6 +2,13 @@
 . "$(dirname $0)/_/husky.sh"
 
 git stash -q --keep-index
+
+# Format the code base
+npm run format
+git add .
+
+# Compile into lib/
 npm run build
 git add lib/index.js
+
 git stash pop -q

@@ -1,16 +1,14 @@
-const core = require("@actions/core");
-const github = require("@actions/github");
+const core = require('@actions/core');
+const github = require('@actions/github');
 
-const makeRelease = require("./create");
-const mergeOnApprove = require("./merge");
+const makeRelease = require('./create');
+const mergeOnApprove = require('./merge');
 
-
-const EVENT_PULL_REQUEST_REVIEW = "pull_request_review";
-const EVENT_SCHEDULE = "schedule";
-
+const EVENT_PULL_REQUEST_REVIEW = 'pull_request_review';
+const EVENT_SCHEDULE = 'schedule';
 
 async function main() {
-  const token = core.getInput("repo-token", { required: true });
+  const token = core.getInput('repo-token', { required: true });
   const client = new github.GitHub(token);
 
   const event = github.context.eventName;

@@ -1,8 +1,7 @@
-const github = require("../__mocks__/@actions/github");
-const makeRelease = require("../src/create");
+const github = require('../__mocks__/@actions/github');
+const makeRelease = require('../src/create');
 
-
-const client = new github.GitHub("token");
+const client = new github.GitHub('token');
 const expectedNotes = `_this Pull Request was automatically generated_
 
 The new version will be: **v2.0.0**
@@ -33,7 +32,6 @@ The new version will be: **v2.0.0**
 - foobar (#515)
 `;
 
-
 beforeEach(() => {
   client.pulls.create.mockClear();
 });
@@ -44,9 +42,9 @@ test('run action - no errors', async () => {
 });
 
 test.each([
-  ["patch", "1.0.1"],
-  ["minor", "1.1.0"],
-  ["major", "2.0.0"],
+  ['patch', '1.0.1'],
+  ['minor', '1.1.0'],
+  ['major', '2.0.0'],
 ])('correct new version (%s)', async (token, expectedVersion) => {
   expect.assertions(1);
 
@@ -58,29 +56,22 @@ test.each([
       owner: expect.any(String),
       repo: expect.any(String),
       title: expect.any(String),
-      body: expect.stringContaining(`The new version will be: **v${expectedVersion}**`),
+      body: expect.stringContaining(
+        `The new version will be: **v${expectedVersion}**`
+      ),
       head: expect.any(String),
       base: expect.any(String),
-    }),
+    })
   );
 });
 
 test.each([
+  ['patch', 'Publish 1 updated icon'],
+  ['add-and-update', 'Publish 2 new icons and 1 updated icon'],
+  ['add-and-remove', 'Publish 2 new icons and 1 removed icon'],
   [
-    "patch",
-    "Publish 1 updated icon",
-  ],
-  [
-    "add-and-update",
-    "Publish 2 new icons and 1 updated icon",
-  ],
-  [
-    "add-and-remove",
-    "Publish 2 new icons and 1 removed icon",
-  ],
-  [
-    "add-remove-and-update",
-    "Publish 2 new icons and 1 updated icon and 1 removed icon",
+    'add-remove-and-update',
+    'Publish 2 new icons and 1 updated icon and 1 removed icon',
   ],
 ])('correct release title (%s)', async (token, expectedTitle) => {
   expect.assertions(1);
@@ -96,7 +87,7 @@ test.each([
       body: expect.any(String),
       head: expect.any(String),
       base: expect.any(String),
-    }),
+    })
   );
 });
 
@@ -113,7 +104,7 @@ test('correct release notes', async () => {
       body: expectedNotes,
       head: expect.any(String),
       base: expect.any(String),
-    }),
+    })
   );
 });
 
@@ -128,8 +119,8 @@ test('correct Pull Request settings', async () => {
       repo: github.context.repo.repo,
       title: expect.any(String),
       body: expect.any(String),
-      head: "develop",
-      base: "master",
-    }),
+      head: 'develop',
+      base: 'master',
+    })
   );
 });

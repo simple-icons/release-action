@@ -1,74 +1,74 @@
 {
-    "icons": [
-        {
-            "title": "1Password",
-            "hex": "363636",
-            "source": "https://1password.com/press/"
-        },
-        {
-            "title": "500px",
-            "hex": "0099E5",
-            "source": "https://about.500px.com/press"
-        },
-        {
-            "title": "ACM",
-            "hex": "0085CA",
-            "source": "http://identitystandards.acm.org/"
-        },
-        {
-            "title": "AddThis",
-            "hex": "FF6550",
-            "source": "http://www.addthis.com/"
-        },
-        {
-            "title": "Adobe",
-            "hex": "FF0000",
-            "source": "https://www.test.com/"
-        },
-        {
-            "title": "Feedly",
-            "hex": "2BB24C",
-            "source": "https://blog.feedly.com/wp-content/themes/feedly-2017-v1.19.3/assets/images/logos/logo.svg"
-        },
-        {
-            "title": "Foo",
-            "hex": "000000",
-            "source": "https://www.example.com/"
-        },
-        {
-            "title": "Intel",
-            "hex": "0071C5",
-            "source": "https://www.intel.com"
-        },
-        {
-            "title": "Jest",
-            "hex": "C21325",
-            "source": "https://jestjs.io/"
-        },
-        {
-            "title": "Mozilla",
-            "hex": "000000",
-            "source": "https://mozilla.ninja/our-logo"
-        },
-        {
-            "title": "Opera",
-            "hex": "FF1B2D",
-            "source": "https://github.com/operasoftware/logo"
-        },
-        {
-            "title": "Pokémon",
-            "hex": "FFCB05",
-            "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
-        },
-        {
-            "title": "Postman",
-            "hex": "FF6C37",
-            "source": "https://www.getpostman.com/resources/media-assets/"
-        },
-        {
-            "title": "WordPress",
-            "hex": "21759B",
-            "source": "https://wordpress.org/about/logos"
-        }
-    ]
+  "icons": [
+    {
+      "title": "1Password",
+      "hex": "363636",
+      "source": "https://1password.com/press/"
+    },
+    {
+      "title": "500px",
+      "hex": "0099E5",
+      "source": "https://about.500px.com/press"
+    },
+    {
+      "title": "ACM",
+      "hex": "0085CA",
+      "source": "http://identitystandards.acm.org/"
+    },
+    {
+      "title": "AddThis",
+      "hex": "FF6550",
+      "source": "http://www.addthis.com/"
+    },
+    {
+      "title": "Adobe",
+      "hex": "FF0000",
+      "source": "https://www.test.com/"
+    },
+    {
+      "title": "Feedly",
+      "hex": "2BB24C",
+      "source": "https://blog.feedly.com/wp-content/themes/feedly-2017-v1.19.3/assets/images/logos/logo.svg"
+    },
+    {
+      "title": "Foo",
+      "hex": "000000",
+      "source": "https://www.example.com/"
+    },
+    {
+      "title": "Intel",
+      "hex": "0071C5",
+      "source": "https://www.intel.com"
+    },
+    {
+      "title": "Jest",
+      "hex": "C21325",
+      "source": "https://jestjs.io/"
+    },
+    {
+      "title": "Mozilla",
+      "hex": "000000",
+      "source": "https://mozilla.ninja/our-logo"
+    },
+    {
+      "title": "Opera",
+      "hex": "FF1B2D",
+      "source": "https://github.com/operasoftware/logo"
+    },
+    {
+      "title": "Pokémon",
+      "hex": "FFCB05",
+      "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
+    },
+    {
+      "title": "Postman",
+      "hex": "FF6C37",
+      "source": "https://www.getpostman.com/resources/media-assets/"
+    },
+    {
+      "title": "WordPress",
+      "hex": "21759B",
+      "source": "https://wordpress.org/about/logos"
+    }
+  ]
 }

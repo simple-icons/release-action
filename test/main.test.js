@@ -1,12 +1,11 @@
-const github = require("../__mocks__/@actions/github");
-const main = require("../src/main");
+const github = require('../__mocks__/@actions/github');
+const main = require('../src/main');
 
-jest.mock("../src/create", () => jest.fn());
-jest.mock("../src/merge", () => jest.fn());
+jest.mock('../src/create', () => jest.fn());
+jest.mock('../src/merge', () => jest.fn());
 
-const createMock = require("../src/create");
-const mergeMock = require("../src/merge");
-
+const createMock = require('../src/create');
+const mergeMock = require('../src/merge');
 
 beforeAll(() => {
   createMock.mockClear();
@@ -16,7 +15,7 @@ beforeAll(() => {
 test('event "schedule"', async () => {
   expect.assertions(1);
 
-  github.context.eventName = "schedule";
+  github.context.eventName = 'schedule';
   await main();
   expect(createMock).toHaveBeenCalledTimes(1);
 });
@@ -24,7 +23,7 @@ test('event "schedule"', async () => {
 test('event "pull_request_review"', async () => {
   expect.assertions(1);
 
-  github.context.eventName = "pull_request_review";
+  github.context.eventName = 'pull_request_review';
   await main();
   expect(mergeMock).toHaveBeenCalledTimes(1);
 });

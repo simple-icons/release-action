@@ -1,5 +1,5 @@
-const github = require('../__mocks__/@actions/github');
-const makeRelease = require('../src/create');
+const github = require('../__mocks__/@actions/github.js');
+const makeRelease = require('../src/create.js');
 
 const client = new github.GitHub('token');
 const expectedNotes = `_this Pull Request was automatically generated_

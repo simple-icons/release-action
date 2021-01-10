@@ -1,8 +1,8 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const makeRelease = require('./create');
-const mergeOnApprove = require('./merge');
+const makeRelease = require('./create.js');
+const mergeOnApprove = require('./merge.js');
 
 const EVENT_PULL_REQUEST_REVIEW = 'pull_request_review';
 const EVENT_SCHEDULE = 'schedule';

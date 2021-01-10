@@ -1,5 +1,5 @@
-const github = require('../__mocks__/@actions/github');
-const mergeOnApprove = require('../src/merge');
+const github = require('../__mocks__/@actions/github.js');
+const mergeOnApprove = require('../src/merge.js');
 
 const client = new github.GitHub('token');
 

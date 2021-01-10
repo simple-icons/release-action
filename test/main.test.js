@@ -1,5 +1,5 @@
-const github = require('../__mocks__/@actions/github');
-const main = require('../src/main');
+const github = require('../__mocks__/@actions/github.js');
+const main = require('../src/main.js');
 
 jest.mock('../src/create', () => jest.fn());
 jest.mock('../src/merge', () => jest.fn());

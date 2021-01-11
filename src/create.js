@@ -492,7 +492,7 @@ function createReleaseTitle(newIcons, updatedIcons, removedIcons) {
 
 function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   const sortAlphabetically = (a, b) =>
-    alphaSort.caseInsensitiveAscending(a.name, b.name);
+    alphaSort({ caseInsensitive: true })(a.name, b.name);
 
   let releaseHeader = '_this Pull Request was automatically generated_\n\n';
   releaseHeader += `The new version will be: **v${newVersion}**\n`;

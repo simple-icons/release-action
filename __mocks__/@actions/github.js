@@ -615,7 +615,7 @@ const defaultClient = {
     merge: jest.fn().mockName('github.pulls.merge'),
   },
   repos: {
-    getContents: jest
+    getContent: jest
       .fn()
       .mockName('github.repos.getContent')
       .mockImplementation((args) => {
@@ -672,7 +672,7 @@ module.exports = {
     },
   },
 
-  GitHub: function (token) {
+  getOctokit: function (token) {
     switch (token) {
       case 'patch':
         return patchReleaseClient;

@@ -9,7 +9,7 @@ const EVENT_SCHEDULE = 'schedule';
 
 async function main() {
   const token = core.getInput('repo-token', { required: true });
-  const client = new github.GitHub(token);
+  const client = new github.getOctokit(token);
 
   const event = github.context.eventName;
   switch (event) {

@@ -1,7 +1,7 @@
 const github = require('../__mocks__/@actions/github.js');
 const mergeOnApprove = require('../src/merge.js');
 
-const client = new github.GitHub('token');
+const client = new github.getOctokit('token');
 
 const APPROVED = 'approved';
 const CHANGES_REQUESTED = 'changes_requested';

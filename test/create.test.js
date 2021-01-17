@@ -1,7 +1,7 @@
 const github = require('../__mocks__/@actions/github.js');
 const makeRelease = require('../src/create.js');
 
-const client = new github.GitHub('token');
+const client = new github.getOctokit('token');
 const expectedNotes = `_this Pull Request was automatically generated_
 
 The new version will be: **v2.0.0**
@@ -48,7 +48,7 @@ test.each([
 ])('correct new version (%s)', async (token, expectedVersion) => {
   expect.assertions(1);
 
-  const _client = github.GitHub(token);
+  const _client = github.getOctokit(token);
   await makeRelease(_client);
 
   expect(_client.pulls.create).toHaveBeenCalledWith(
@@ -76,7 +76,7 @@ test.each([
 ])('correct release title (%s)', async (token, expectedTitle) => {
   expect.assertions(1);
 
-  const _client = github.GitHub(token);
+  const _client = github.getOctokit(token);
   await makeRelease(_client);
 
   expect(_client.pulls.create).toHaveBeenCalledWith(

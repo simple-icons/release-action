@@ -180,7 +180,7 @@ async function createPullRequest(client, title, body, head, base) {
 const _ghFileCache = {};
 async function getPrFile(client, path, ref) {
   if (_ghFileCache[path + ref] === undefined) {
-    const fileContents = await client.repos.getContents({
+    const fileContents = await client.repos.getContent({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       path: path,

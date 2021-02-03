@@ -351,16 +351,9 @@ function getChangesFromFile(file, id) {
       });
     }
 
-    const sourceRemovals = [...file.patch.matchAll(JSON_REMOVE_EXPR)];
-    for (let sourceRemoval of sourceRemovals) {
-      const name = sourceRemoval[1];
-      changes.push({
-        id: id + name,
-        changeType: CHANGE_TYPE_REMOVED,
-        name: name,
-        prNumbers: [file.prNumber],
-      });
-    }
+    // Removals in the source are ignored for simplicity *and* because removals
+    // will always be captured by the file being removed. For more see:
+    //   https://github.com/simple-icons/release-action/issues/25
 
     return changes;
   } else {

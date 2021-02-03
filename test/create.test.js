@@ -29,7 +29,7 @@ The new version will be: **v2.0.0**
 
 # Removed Icons
 
-- foobar (#515)
+- Foobar (#515)
 `;
 
 beforeEach(() => {

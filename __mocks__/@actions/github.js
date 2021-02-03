@@ -451,7 +451,7 @@ const prFiles = {
     {
       filename: 'icons/foobar.svg',
       status: STATUS_REMOVED,
-      patch: '-' + svgs['foo.svg'],
+      patch: '-' + svgs['foobar.svg'],
     },
     {
       filename: SI_DATA_FILE,
@@ -460,7 +460,7 @@ const prFiles = {
              "source": "https://blog.pocketcasts.com/press/"
          },
 -        {
--           "title": "foobar",
+-           "title": "Foobar",
 -           "hex": "FFCB05",
 -           "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 -        },
@@ -506,6 +506,10 @@ const files = {
   },
   'icons/foo.svg': {
     content: encode(svgs['foo.svg'], BASE64),
+    encoding: BASE64,
+  },
+  'icons/foobar.svg': {
+    content: encode(svgs['foobar.svg'], BASE64),
     encoding: BASE64,
   },
   'icons/intel.svg': {

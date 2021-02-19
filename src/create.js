@@ -36,7 +36,8 @@ const COMMIT_TYPE_BLOB = 'blob';
 
 const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
 const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
-const JSON_REMOVE_EXPR = /-\s+"title":\s*"(.*)"/g;
+
+const OUTPUT_NEW_VERSION_NAME = 'new-version';
 
 // Helper functions
 function encode(data, encoding) {
@@ -626,6 +627,7 @@ async function makeRelease(client) {
 
   await createReleasePr(client, releaseTitle, releaseNotes);
   await versionBump(client, newVersion);
+  core.setOutput(OUTPUT_NEW_VERSION_NAME, newVersion);
 }
 
 module.exports = makeRelease;

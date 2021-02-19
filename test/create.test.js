@@ -1,3 +1,4 @@
+const core = require('../__mocks__/@actions/core.js');
 const github = require('../__mocks__/@actions/github.js');
 const makeRelease = require('../src/create.js');
 
@@ -46,11 +47,12 @@ test.each([
   ['minor', '1.1.0'],
   ['major', '2.0.0'],
 ])('correct new version (%s)', async (token, expectedVersion) => {
-  expect.assertions(1);
+  expect.assertions(2);
 
   const _client = github.getOctokit(token);
   await makeRelease(_client);
 
+  expect(core.setOutput).toHaveBeenCalledWith('new-version', expectedVersion);
   expect(_client.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
       owner: expect.any(String),

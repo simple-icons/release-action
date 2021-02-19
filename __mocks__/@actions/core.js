@@ -5,5 +5,6 @@ module.exports = {
 
   debug: jest.fn().mockName('core.debug'),
   info: jest.fn().mockName('core.info'),
+  setOutput: jest.fn().mockName('core.setOutput'),
   warning: jest.fn().mockName('core.warning'),
 };

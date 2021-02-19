@@ -33,6 +33,7 @@ const RELEASE_LABEL = 'release';
 const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
 const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
 
+const OUTPUT_DID_CREATE_PR_NAME = 'did-create-pr';
 const OUTPUT_NEW_VERSION_NAME = 'new-version';
 
 // Helper functions
@@ -497,8 +498,10 @@ async function makeRelease(client) {
     removedIcons.length === 0
   ) {
     core.info('No notable changes detected');
+    core.setOutput(OUTPUT_DID_CREATE_PR_NAME, 'false');
     return;
   }
+  core.setOutput(OUTPUT_DID_CREATE_PR_NAME, 'true');
 
   const newVersion = await getNextVersionNumber(client, {
     added: newIcons,

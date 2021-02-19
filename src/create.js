@@ -9,7 +9,6 @@ const UTF8 = 'utf-8';
 
 const SI_DATA_FILE = '_data/simple-icons.json';
 const PACKAGE_FILE = 'package.json';
-const PACKAGE_LOCK_FILE = 'package-lock.json';
 
 const STATUS_ADDED = 'added';
 const STATUS_MODIFIED = 'modified';
@@ -31,24 +30,12 @@ const REF_MASTER = 'master';
 
 const RELEASE_LABEL = 'release';
 
-const COMMIT_MODE_FILE = '100644';
-const COMMIT_TYPE_BLOB = 'blob';
-
 const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
 const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
 
 const OUTPUT_NEW_VERSION_NAME = 'new-version';
 
 // Helper functions
-function encode(data, encoding) {
-  if (encoding === BASE64) {
-    const dataBuffer = Buffer.from(data, UTF8);
-    return dataBuffer.toString(BASE64);
-  } else {
-    throw Error(`Unknown encoding ${encoding}`);
-  }
-}
-
 function decode(data, encoding) {
   if (encoding === BASE64) {
     const dataBuffer = Buffer.from(data, BASE64);
@@ -99,69 +86,6 @@ async function addLabels(client, issueNumber, labels) {
     repo: github.context.repo.repo,
     issue_number: issueNumber,
     labels: labels,
-  });
-}
-
-async function commitFiles(client, commitMessage, files) {
-  core.debug('commitFiles - getRef');
-  const { data: refData } = await client.git.getRef({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    ref: `heads/${REF_DEVELOP}`,
-  });
-
-  core.debug('commitFiles - getCommit');
-  const { data: previousCommit } = await client.git.getCommit({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    commit_sha: refData.object.sha,
-  });
-
-  core.debug('commitFiles - createBlobs');
-  const blobs = [];
-  for (let file of files) {
-    core.debug('commitFiles - encoding');
-    const encodedFileData = encode(file.data, BASE64);
-
-    core.debug('commitFiles - createBlob');
-    const { data: fileBlob } = await client.git.createBlob({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      content: encodedFileData,
-      encoding: BASE64,
-    });
-
-    blobs.push({
-      mode: COMMIT_MODE_FILE,
-      path: file.path,
-      sha: fileBlob.sha,
-      type: COMMIT_TYPE_BLOB,
-    });
-  }
-
-  core.debug('commitFiles - createTree');
-  const { data: newTree } = await client.git.createTree({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    base_tree: previousCommit.tree.sha,
-    tree: blobs,
-  });
-
-  core.debug('commitFiles - createCommit');
-  const { data: newCommit } = await client.git.createCommit({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    message: commitMessage,
-    tree: newTree.sha,
-    parents: [previousCommit.sha],
-  });
-
-  core.debug('commitFiles - updateRef');
-  await client.git.updateRef({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    ref: `heads/${REF_DEVELOP}`,
-    sha: newCommit.sha,
   });
 }
 
@@ -540,42 +464,6 @@ async function createReleasePr(client, title, body) {
   core.info(`Added the '${RELEASE_LABEL}' label to PR ${prNumber}`);
 }
 
-async function versionBump(client, newVersion) {
-  const packageJsonFile = await getPrFile(client, PACKAGE_FILE, REF_DEVELOP);
-  const packageJson = JSON.parse(packageJsonFile);
-  if (packageJson.version === newVersion) {
-    core.debug(`version in package.json already updated`);
-    return;
-  }
-
-  core.info(`bumping version in ${PACKAGE_FILE}`);
-  packageJson.version = newVersion;
-  let updatedPackageJson = JSON.stringify(packageJson, null, 2);
-  if (!updatedPackageJson.endsWith('\n')) {
-    updatedPackageJson += '\n';
-  }
-
-  core.info(`bumping version in ${PACKAGE_LOCK_FILE}`);
-  const packageLockJsonFile = await getPrFile(
-    client,
-    PACKAGE_LOCK_FILE,
-    REF_DEVELOP
-  );
-  const packageLockJson = JSON.parse(packageLockJsonFile);
-  packageLockJson.version = newVersion;
-  let updatedPackageLockJson = JSON.stringify(packageLockJson, null, 2);
-  if (!updatedPackageLockJson.endsWith('\n')) {
-    updatedPackageLockJson += '\n';
-  }
-
-  core.info('Committing version bump...');
-  await commitFiles(client, 'version bump', [
-    { path: PACKAGE_FILE, data: updatedPackageJson },
-    { path: PACKAGE_LOCK_FILE, data: updatedPackageLockJson },
-  ]);
-  core.info('Version bump committed.');
-}
-
 async function getChanges(client) {
   let newIcons = [],
     updatedIcons = [],
@@ -626,7 +514,6 @@ async function makeRelease(client) {
   );
 
   await createReleasePr(client, releaseTitle, releaseNotes);
-  await versionBump(client, newVersion);
   core.setOutput(OUTPUT_NEW_VERSION_NAME, newVersion);
 }
 

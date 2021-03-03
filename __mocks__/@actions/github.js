@@ -539,53 +539,6 @@ const files = {
 };
 
 const defaultClient = {
-  git: {
-    getRef: jest
-      .fn()
-      .mockName('github.git.getRef')
-      .mockImplementation(() => {
-        return {
-          data: {
-            object: { sha: '820034babcbc54629dc760f9ecd36633a9f5a64a' },
-          },
-        };
-      }),
-    getCommit: jest
-      .fn()
-      .mockName('github.git.getCommit')
-      .mockImplementation(() => {
-        return {
-          data: {
-            sha: '7be9878fcf5392448a6fa73a7b666f4096b228bf',
-            tree: { sha: '70fed4e8a7f601ccbe3cf5b5371689be0c444573' },
-          },
-        };
-      }),
-    createBlob: jest
-      .fn()
-      .mockName('github.git.createBlob')
-      .mockImplementation(() => {
-        return { data: { sha: '7c1a3035afa82d1146e576135c719b57352d1dda' } };
-      }),
-    createTree: jest
-      .fn()
-      .mockName('github.git.createTree')
-      .mockImplementation(() => {
-        return { data: { sha: '156b0ea79132fd85ea82119aa7bd724084bd3b82' } };
-      }),
-    createCommit: jest
-      .fn()
-      .mockName('github.git.createCommit')
-      .mockImplementation(() => {
-        return { data: { sha: 'bfdfaf45e31a6c75d0d03b364559e3483d43befa' } };
-      }),
-    updateRef: jest
-      .fn()
-      .mockName('github.git.updateRef')
-      .mockImplementation(() => {
-        return;
-      }),
-  },
   issues: {
     addLabels: jest
       .fn()

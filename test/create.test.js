@@ -1,6 +1,7 @@
-const core = require('../__mocks__/@actions/core.js');
-const github = require('../__mocks__/@actions/github.js');
-const makeRelease = require('../src/create.js');
+import * as core from '../__mocks__/@actions/core.js';
+import * as github from '../__mocks__/@actions/github.js';
+
+import makeRelease from '../src/create.js';
 
 const client = new github.getOctokit('token');
 const expectedNotes = `_this Pull Request was automatically generated_
@@ -39,7 +40,9 @@ beforeEach(() => {
 
 test('run action - no errors', async () => {
   expect.assertions(1);
-  await expect(makeRelease(client)).resolves.not.toBeDefined();
+  await expect(
+    makeRelease(core, client, github.context)
+  ).resolves.not.toBeDefined();
 });
 
 test.each([
@@ -50,7 +53,7 @@ test.each([
   expect.assertions(2);
 
   const _client = github.getOctokit(token);
-  await makeRelease(_client);
+  await makeRelease(core, _client, github.context);
 
   expect(core.setOutput).toHaveBeenCalledWith('new-version', expectedVersion);
   expect(_client.pulls.create).toHaveBeenCalledWith(
@@ -79,7 +82,7 @@ test.each([
   expect.assertions(1);
 
   const _client = github.getOctokit(token);
-  await makeRelease(_client);
+  await makeRelease(core, _client, github.context);
 
   expect(_client.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -96,7 +99,7 @@ test.each([
 test('correct release notes', async () => {
   expect.assertions(1);
 
-  await makeRelease(client);
+  await makeRelease(core, client, github.context);
 
   expect(client.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -113,7 +116,7 @@ test('correct release notes', async () => {
 test('correct Pull Request settings', async () => {
   expect.assertions(1);
 
-  await makeRelease(client);
+  await makeRelease(core, client, github.context);
 
   expect(client.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({

@@ -1,5 +1,7 @@
-const github = require('../__mocks__/@actions/github.js');
-const mergeOnApprove = require('../src/merge.js');
+import * as core from '../__mocks__/@actions/core.js';
+import * as github from '../__mocks__/@actions/github.js';
+
+import mergeOnApprove from '../src/merge.js';
 
 const client = new github.getOctokit('token');
 
@@ -24,7 +26,9 @@ The new version will be: **v1.4.0**
 - Abstract (#509)
 `;
 
-beforeEach(() => client.pulls.merge.mockClear());
+beforeEach(() => {
+  client.pulls.merge.mockClear();
+});
 
 test.each(['OWNER', 'MEMBER'])(
   `merge when ${APPROVED} as %s`,
@@ -44,7 +48,7 @@ test.each(['OWNER', 'MEMBER'])(
       },
     };
 
-    await mergeOnApprove(client);
+    await mergeOnApprove(core, client, github.context);
     expect(client.pulls.merge).toHaveBeenCalled();
   }
 );
@@ -70,7 +74,7 @@ test.each([
     },
   };
 
-  await mergeOnApprove(client);
+  await mergeOnApprove(core, client, github.context);
   expect(client.pulls.merge).not.toHaveBeenCalled();
 });
 
@@ -103,7 +107,7 @@ test.each([
     },
   };
 
-  await mergeOnApprove(client);
+  await mergeOnApprove(core, client, github.context);
   expect(client.pulls.merge).not.toHaveBeenCalled();
 });
 
@@ -123,6 +127,6 @@ test('do not merge if base is not master', async () => {
     },
   };
 
-  await mergeOnApprove(client);
+  await mergeOnApprove(core, client, github.context);
   expect(client.pulls.merge).not.toHaveBeenCalled();
 });

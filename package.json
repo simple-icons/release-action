@@ -4,7 +4,8 @@
   "private": true,
   "description": "Release Action for Simple Icons",
   "license": "CC0-1.0",
-  "main": "src/index.js",
+  "exports": "./src/index.js",
+  "type": "module",
   "author": {
     "name": "Eric Cornelissen",
     "email": "ericornelissen@gmail.com"
@@ -14,7 +15,7 @@
     "format": "prettier --write --single-quote .",
     "lint": "prettier --check --single-quote .",
     "postinstall": "is-ci || husky install",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "dependencies": {
     "@actions/core": "1.2.6",

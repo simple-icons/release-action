@@ -1,29 +1,30 @@
-const github = require('../__mocks__/@actions/github.js');
-const main = require('../src/main.js');
+import { jest } from '@jest/globals';
 
-jest.mock('../src/create', () => jest.fn());
-jest.mock('../src/merge', () => jest.fn());
+import * as core from '../__mocks__/@actions/core.js';
+import * as github from '../__mocks__/@actions/github.js';
 
-const createMock = require('../src/create');
-const mergeMock = require('../src/merge');
+import main from '../src/main.js';
+
+const makeRelease = jest.fn();
+const mergeOnApprove = jest.fn();
 
 beforeAll(() => {
-  createMock.mockClear();
-  mergeMock.mockClear();
+  makeRelease.mockClear();
+  mergeOnApprove.mockClear();
 });
 
 test('event "schedule"', async () => {
   expect.assertions(1);
 
   github.context.eventName = 'schedule';
-  await main();
-  expect(createMock).toHaveBeenCalledTimes(1);
+  await main(core, github, { makeRelease });
+  expect(makeRelease).toHaveBeenCalledTimes(1);
 });
 
 test('event "pull_request_review"', async () => {
   expect.assertions(1);
 
   github.context.eventName = 'pull_request_review';
-  await main();
-  expect(mergeMock).toHaveBeenCalledTimes(1);
+  await main(core, github, { mergeOnApprove });
+  expect(mergeOnApprove).toHaveBeenCalledTimes(1);
 });

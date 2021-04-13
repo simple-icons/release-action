@@ -1,8 +1,6 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-const alphaSort = require('alpha-sort');
-const moment = require('moment');
-const semverInc = require('semver/functions/inc');
+import alphaSort from 'alpha-sort';
+import moment from 'moment';
+import semverInc from 'semver/functions/inc';
 
 const BASE64 = 'base64';
 const UTF8 = 'utf-8';
@@ -81,19 +79,19 @@ function prNumbersToString(prNumbers) {
 }
 
 // GitHub API
-async function addLabels(client, issueNumber, labels) {
+async function addLabels(client, context, issueNumber, labels) {
   await client.issues.addLabels({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     issue_number: issueNumber,
     labels: labels,
   });
 }
 
-async function createPullRequest(client, title, body, head, base) {
+async function createPullRequest(client, context, title, body, head, base) {
   const { data } = await client.pulls.create({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     title: title,
     body: body,
     head: head,
@@ -104,11 +102,11 @@ async function createPullRequest(client, title, body, head, base) {
 }
 
 const _ghFileCache = {};
-async function getPrFile(client, path, ref) {
+async function getPrFile(client, context, path, ref) {
   if (_ghFileCache[path + ref] === undefined) {
     const fileContents = await client.repos.getContent({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
       path: path,
       ref: ref,
     });
@@ -123,17 +121,22 @@ async function getPrFile(client, path, ref) {
   return _ghFileCache[path + ref];
 }
 
-async function* getPrFiles(client, prNumber) {
+async function* getPrFiles(core, client, context, prNumber) {
   const { data: files } = await client.pulls.listFiles({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     pull_number: prNumber,
   });
 
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
     try {
       yield {
-        content: await getPrFile(client, fileInfo.filename, REF_DEVELOP),
+        content: await getPrFile(
+          client,
+          context,
+          fileInfo.filename,
+          REF_DEVELOP
+        ),
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
@@ -148,7 +151,12 @@ async function* getPrFiles(client, prNumber) {
   for (let fileInfo of files.filter(iconFiles).filter(removedFiles)) {
     try {
       yield {
-        content: await getPrFile(client, fileInfo.filename, REF_MASTER),
+        content: await getPrFile(
+          client,
+          context,
+          fileInfo.filename,
+          REF_MASTER
+        ),
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
@@ -163,7 +171,7 @@ async function* getPrFiles(client, prNumber) {
   const dataFile = files.find((file) => isSimpleIconsDataFile(file.filename));
   if (dataFile !== undefined) {
     yield {
-      content: await getPrFile(client, dataFile.filename, REF_DEVELOP),
+      content: await getPrFile(client, context, dataFile.filename, REF_DEVELOP),
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
@@ -171,15 +179,15 @@ async function* getPrFiles(client, prNumber) {
   }
 }
 
-async function getFilesSinceLastRelease(client) {
+async function getFilesSinceLastRelease(core, client, context) {
   const perPage = 10;
 
   let files = [],
     page = 1;
   while (true) {
     const { data: prs } = await client.pulls.list({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
       state: 'closed',
       sort: 'updated',
       direction: 'desc',
@@ -203,7 +211,7 @@ async function getFilesSinceLastRelease(client) {
         );
       }
 
-      for await (let file of getPrFiles(client, pr.number)) {
+      for await (let file of getPrFiles(core, client, context, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
         file.merged_at = pr.merged_at;
@@ -221,7 +229,7 @@ async function getFilesSinceLastRelease(client) {
 }
 
 // Logic determining changes
-function getChangesFromFile(file, id) {
+function getChangesFromFile(core, file, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
     core.info(`Detected an icon was added ('${file.path}')`);
 
@@ -361,7 +369,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
 }
 
 // Release logic
-async function getNextVersionNumber(client, changes) {
+async function getNextVersionNumber(client, context, changes) {
   let releaseType = RELEASE_PATCH;
   if (changes.added.length > 0) {
     releaseType = RELEASE_MINOR;
@@ -370,7 +378,12 @@ async function getNextVersionNumber(client, changes) {
     releaseType = RELEASE_MAJOR;
   }
 
-  const packageJsonFile = await getPrFile(client, PACKAGE_FILE, REF_MASTER);
+  const packageJsonFile = await getPrFile(
+    client,
+    context,
+    PACKAGE_FILE,
+    REF_MASTER
+  );
   const packageJson = JSON.parse(packageJsonFile);
 
   const newVersion = semverInc(packageJson.version, releaseType);
@@ -416,7 +429,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   let releaseHeader = '_this Pull Request was automatically generated_\n\n';
   releaseHeader += `The new version will be: **v${newVersion}**\n`;
 
-  releaseNotes = '';
+  let releaseNotes = '';
   if (newIcons.length > 0) {
     releaseNotes += '\n# New Icons\n\n';
     for (let newIcon of newIcons.sort(sortAlphabetically)) {
@@ -444,7 +457,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   return releaseHeader + releaseNotes;
 }
 
-async function createReleasePr(client, title, body) {
+async function createReleasePr(core, client, context, title, body) {
   core.info('\n Creating PR for release:');
   core.info('PR title:');
   core.info(`   ${title}`);
@@ -453,6 +466,7 @@ async function createReleasePr(client, title, body) {
 
   const prNumber = await createPullRequest(
     client,
+    context,
     title,
     body,
     BRANCH_DEVELOP,
@@ -461,21 +475,21 @@ async function createReleasePr(client, title, body) {
   core.info(`\nNew release PR is: ${prNumber}`);
 
   core.info(`Adding label '${RELEASE_LABEL}' to PR ${prNumber}`);
-  await addLabels(client, prNumber, [RELEASE_LABEL]);
+  await addLabels(client, context, prNumber, [RELEASE_LABEL]);
   core.info(`Added the '${RELEASE_LABEL}' label to PR ${prNumber}`);
 }
 
-async function getChanges(client) {
+async function getChanges(core, client, context) {
   let newIcons = [],
     updatedIcons = [],
     removedIcons = [],
     i = 0;
 
-  const files = await getFilesSinceLastRelease(client);
+  const files = await getFilesSinceLastRelease(core, client, context);
   for (let file of files) {
     i = i + 1;
 
-    const items = getChangesFromFile(file, i);
+    const items = getChangesFromFile(core, file, i);
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);
@@ -490,8 +504,12 @@ async function getChanges(client) {
   return filterDuplicates(newIcons, updatedIcons, removedIcons);
 }
 
-async function makeRelease(client) {
-  const [newIcons, updatedIcons, removedIcons] = await getChanges(client);
+async function makeRelease(core, client, context) {
+  const [newIcons, updatedIcons, removedIcons] = await getChanges(
+    core,
+    client,
+    context
+  );
   if (
     newIcons.length === 0 &&
     updatedIcons.length === 0 &&
@@ -503,7 +521,7 @@ async function makeRelease(client) {
   }
   core.setOutput(OUTPUT_DID_CREATE_PR_NAME, 'true');
 
-  const newVersion = await getNextVersionNumber(client, {
+  const newVersion = await getNextVersionNumber(client, context, {
     added: newIcons,
     modified: updatedIcons,
     removed: removedIcons,
@@ -516,8 +534,8 @@ async function makeRelease(client) {
     removedIcons
   );
 
-  await createReleasePr(client, releaseTitle, releaseNotes);
+  await createReleasePr(core, client, context, releaseTitle, releaseNotes);
   core.setOutput(OUTPUT_NEW_VERSION_NAME, newVersion);
 }
 
-module.exports = makeRelease;
+export default makeRelease;

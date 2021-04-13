@@ -1,10 +1,20 @@
-const _ = require('lodash');
+import { jest } from '@jest/globals';
+import * as fs from 'fs';
+import _ from 'lodash';
 
-const packageJson = JSON.stringify(require('../../test/fixtures/package.json'));
-const simpleIconsData = JSON.stringify(
-  require('../../test/fixtures/simple-icons.json')
+const packageJsonUrl = new URL(
+  '../../test/fixtures/package.json',
+  import.meta.url
 );
-const svgs = require('../../test/fixtures/svgs.json');
+const simpleIconsUrl = new URL(
+  '../../test/fixtures/simple-icons.json',
+  import.meta.url
+);
+const svgsUrl = new URL('../../test/fixtures/svgs.json', import.meta.url);
+
+const packageJson = fs.readFileSync(packageJsonUrl);
+const simpleIconsData = fs.readFileSync(simpleIconsUrl);
+const svgs = JSON.parse(fs.readFileSync(svgsUrl));
 
 const BASE64 = 'base64';
 const UTF8 = 'utf-8';
@@ -620,31 +630,29 @@ addRemoveAndUpdateReleaseClient.pulls.list = jest
     };
   });
 
-module.exports = {
-  context: {
-    eventName: 'schedule',
-    repo: {
-      owner: 'simple-icons',
-      repo: 'simple-icons',
-    },
-  },
-
-  getOctokit: function (token) {
-    switch (token) {
-      case 'patch':
-        return patchReleaseClient;
-      case 'minor':
-        return minorReleaseClient;
-      case 'major':
-        return majorReleaseClient;
-      case 'add-and-update':
-        return addAndUpdateReleaseClient;
-      case 'add-and-remove':
-        return addAndRemoveReleaseClient;
-      case 'add-remove-and-update':
-        return addRemoveAndUpdateReleaseClient;
-      default:
-        return defaultClient;
-    }
+export const context = {
+  eventName: 'schedule',
+  repo: {
+    owner: 'simple-icons',
+    repo: 'simple-icons',
   },
 };
+
+export function getOctokit(token) {
+  switch (token) {
+    case 'patch':
+      return patchReleaseClient;
+    case 'minor':
+      return minorReleaseClient;
+    case 'major':
+      return majorReleaseClient;
+    case 'add-and-update':
+      return addAndUpdateReleaseClient;
+    case 'add-and-remove':
+      return addAndRemoveReleaseClient;
+    case 'add-remove-and-update':
+      return addRemoveAndUpdateReleaseClient;
+    default:
+      return defaultClient;
+  }
+}

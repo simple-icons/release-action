@@ -1,6 +1,3 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-
 const REF_MASTER = 'master';
 
 const APPROVED = 'approved';
@@ -12,7 +9,7 @@ const VALID_ASSOCIATIONS = [
 
 const RELEASE_MERGE_METHOD = 'merge';
 
-async function doMerge(client, pr) {
+async function doMerge(core, client, context, pr) {
   core.info(`Merging #${pr.number}`);
 
   const newVersion = pr.body.split('**')[1];
@@ -21,8 +18,8 @@ async function doMerge(client, pr) {
   const commitMessage = '#' + pr.body.split('#').slice(1).join('#');
 
   await client.pulls.merge({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     pull_number: pr.number,
     commit_title: commitTitle,
     commit_message: commitMessage,
@@ -30,8 +27,8 @@ async function doMerge(client, pr) {
   });
 }
 
-async function mergeOnApprove(client) {
-  const payload = github.context.payload;
+async function mergeOnApprove(core, client, context) {
+  const payload = context.payload;
 
   const pr = payload.pull_request;
   if (pr.base.ref !== REF_MASTER) {
@@ -55,7 +52,7 @@ async function mergeOnApprove(client) {
     return;
   }
 
-  await doMerge(client, pr);
+  await doMerge(core, client, context, pr);
 }
 
-module.exports = mergeOnApprove;
+export default mergeOnApprove;

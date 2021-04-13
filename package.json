@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "ncc build src/index.js -m -o lib",
+    "postbuild": "mv lib/index.js lib/index.cjs",
     "format": "prettier --write --single-quote .",
     "lint": "prettier --check --single-quote .",
     "postinstall": "is-ci || husky install",

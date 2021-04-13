@@ -1,5 +1,5 @@
 name: 'Simple Icons Release'
-description: 'Automatical releases for Simple Icons'
+description: 'Automatic releases for Simple Icons'
 author: 'Eric Cornelissen'
 
 inputs:
@@ -9,4 +9,4 @@ inputs:
 
 runs:
   using: 'node12'
-  main: 'lib/index.js'
+  main: 'lib/index.cjs'

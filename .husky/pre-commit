@@ -9,6 +9,6 @@ git add .
 
 # Compile into lib/
 npm run build
-git add lib/index.js
+git add lib/index.cjs
 
 git stash pop -q

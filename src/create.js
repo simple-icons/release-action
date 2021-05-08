@@ -180,10 +180,11 @@ async function* getPrFiles(core, client, context, prNumber) {
 }
 
 async function getFilesSinceLastRelease(core, client, context) {
+  const ignorePRs = [5616];
   const perPage = 10;
 
-  let files = [],
-    page = 1;
+  const files = [];
+  let page = 1;
   while (true) {
     const { data: prs } = await client.pulls.list({
       owner: context.repo.owner,
@@ -200,6 +201,11 @@ async function getFilesSinceLastRelease(core, client, context) {
       core.info(`processing PR #${pr.number}`);
       if (isMerged(pr) === false) {
         // If the PR is not merged the changes won't be included in this release
+        continue;
+      }
+
+      if (ignorePRs.includes(pr.number)) {
+        // Ignore some PRs that we're not interested in
         continue;
       }
 
@@ -312,8 +318,8 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
   );
 
   // An added icon was removed before the release
-  let removeFromAdded = [],
-    removeFromRemoved = [];
+  let removeFromAdded = [];
+  let removeFromRemoved = [];
   for (let newIcon of newIcons) {
     for (let removedIcon of removedIcons) {
       if (removedIcon.name === newIcon.name) {
@@ -480,10 +486,10 @@ async function createReleasePr(core, client, context, title, body) {
 }
 
 async function getChanges(core, client, context) {
-  let newIcons = [],
-    updatedIcons = [],
-    removedIcons = [],
-    i = 0;
+  const newIcons = [];
+  const updatedIcons = [];
+  const removedIcons = [];
+  let i = 0;
 
   const files = await getFilesSinceLastRelease(core, client, context);
   for (let file of files) {

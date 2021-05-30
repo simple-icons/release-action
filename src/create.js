@@ -28,7 +28,7 @@ const REF_MASTER = 'master';
 
 const RELEASE_LABEL = 'release';
 
-const SVG_TITLE_EXPR = /<title>(.*) icon<\/title>/;
+const SVG_TITLE_EXPR = /<title>(.*)<\/title>/;
 const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
 
 const OUTPUT_DID_CREATE_PR_NAME = 'did-create-pr';

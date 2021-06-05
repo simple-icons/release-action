@@ -2,6 +2,8 @@ import alphaSort from 'alpha-sort';
 import moment from 'moment';
 import semverInc from 'semver/functions/inc';
 
+const IGNORE_PRS = [5838, 5847];
+
 const BASE64 = 'base64';
 const UTF8 = 'utf-8';
 
@@ -180,7 +182,6 @@ async function* getPrFiles(core, client, context, prNumber) {
 }
 
 async function getFilesSinceLastRelease(core, client, context) {
-  const ignorePRs = [5616];
   const perPage = 10;
 
   const files = [];
@@ -204,7 +205,7 @@ async function getFilesSinceLastRelease(core, client, context) {
         continue;
       }
 
-      if (ignorePRs.includes(pr.number)) {
+      if (IGNORE_PRS.includes(pr.number)) {
         // Ignore some PRs that we're not interested in
         continue;
       }

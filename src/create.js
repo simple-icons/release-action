@@ -82,7 +82,7 @@ function prNumbersToString(prNumbers) {
 
 // GitHub API
 async function addLabels(client, context, issueNumber, labels) {
-  await client.issues.addLabels({
+  await client.rest.issues.addLabels({
     owner: context.repo.owner,
     repo: context.repo.repo,
     issue_number: issueNumber,
@@ -91,7 +91,7 @@ async function addLabels(client, context, issueNumber, labels) {
 }
 
 async function createPullRequest(client, context, title, body, head, base) {
-  const { data } = await client.pulls.create({
+  const { data } = await client.rest.pulls.create({
     owner: context.repo.owner,
     repo: context.repo.repo,
     title: title,
@@ -106,7 +106,7 @@ async function createPullRequest(client, context, title, body, head, base) {
 const _ghFileCache = {};
 async function getPrFile(client, context, path, ref) {
   if (_ghFileCache[path + ref] === undefined) {
-    const fileContents = await client.repos.getContent({
+    const fileContents = await client.rest.repos.getContent({
       owner: context.repo.owner,
       repo: context.repo.repo,
       path: path,
@@ -124,7 +124,7 @@ async function getPrFile(client, context, path, ref) {
 }
 
 async function* getPrFiles(core, client, context, prNumber) {
-  const { data: files } = await client.pulls.listFiles({
+  const { data: files } = await client.rest.pulls.listFiles({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: prNumber,
@@ -187,7 +187,7 @@ async function getFilesSinceLastRelease(core, client, context) {
   const files = [];
   let page = 1;
   while (true) {
-    const { data: prs } = await client.pulls.list({
+    const { data: prs } = await client.rest.pulls.list({
       owner: context.repo.owner,
       repo: context.repo.repo,
       state: 'closed',

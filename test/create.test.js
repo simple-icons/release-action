@@ -35,7 +35,7 @@ The new version will be: **v2.0.0**
 `;
 
 beforeEach(() => {
-  client.pulls.create.mockClear();
+  client.rest.pulls.create.mockClear();
 });
 
 test('run action - no errors', async () => {
@@ -56,7 +56,7 @@ test.each([
   await makeRelease(core, _client, github.context);
 
   expect(core.setOutput).toHaveBeenCalledWith('new-version', expectedVersion);
-  expect(_client.pulls.create).toHaveBeenCalledWith(
+  expect(_client.rest.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
       owner: expect.any(String),
       repo: expect.any(String),
@@ -84,7 +84,7 @@ test.each([
   const _client = github.getOctokit(token);
   await makeRelease(core, _client, github.context);
 
-  expect(_client.pulls.create).toHaveBeenCalledWith(
+  expect(_client.rest.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
       owner: expect.any(String),
       repo: expect.any(String),
@@ -101,7 +101,7 @@ test('correct release notes', async () => {
 
   await makeRelease(core, client, github.context);
 
-  expect(client.pulls.create).toHaveBeenCalledWith(
+  expect(client.rest.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
       owner: expect.any(String),
       repo: expect.any(String),
@@ -118,7 +118,7 @@ test('correct Pull Request settings', async () => {
 
   await makeRelease(core, client, github.context);
 
-  expect(client.pulls.create).toHaveBeenCalledWith(
+  expect(client.rest.pulls.create).toHaveBeenCalledWith(
     expect.objectContaining({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,

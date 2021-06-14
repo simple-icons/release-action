@@ -17,7 +17,7 @@ async function doMerge(core, client, context, pr) {
     pr.title.replace('Publish', 'Release') + ` (${newVersion})`;
   const commitMessage = '#' + pr.body.split('#').slice(1).join('#');
 
-  await client.pulls.merge({
+  await client.rest.pulls.merge({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: pr.number,

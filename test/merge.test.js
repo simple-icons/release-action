@@ -27,7 +27,7 @@ The new version will be: **v1.4.0**
 `;
 
 beforeEach(() => {
-  client.pulls.merge.mockClear();
+  client.rest.pulls.merge.mockClear();
 });
 
 test.each(['OWNER', 'MEMBER'])(
@@ -49,7 +49,7 @@ test.each(['OWNER', 'MEMBER'])(
     };
 
     await mergeOnApprove(core, client, github.context);
-    expect(client.pulls.merge).toHaveBeenCalled();
+    expect(client.rest.pulls.merge).toHaveBeenCalled();
   }
 );
 
@@ -75,7 +75,7 @@ test.each([
   };
 
   await mergeOnApprove(core, client, github.context);
-  expect(client.pulls.merge).not.toHaveBeenCalled();
+  expect(client.rest.pulls.merge).not.toHaveBeenCalled();
 });
 
 test.each([
@@ -108,7 +108,7 @@ test.each([
   };
 
   await mergeOnApprove(core, client, github.context);
-  expect(client.pulls.merge).not.toHaveBeenCalled();
+  expect(client.rest.pulls.merge).not.toHaveBeenCalled();
 });
 
 test('do not merge if base is not master', async () => {
@@ -128,5 +128,5 @@ test('do not merge if base is not master', async () => {
   };
 
   await mergeOnApprove(core, client, github.context);
-  expect(client.pulls.merge).not.toHaveBeenCalled();
+  expect(client.rest.pulls.merge).not.toHaveBeenCalled();
 });

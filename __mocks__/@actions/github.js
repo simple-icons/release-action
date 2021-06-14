@@ -549,80 +549,82 @@ const files = {
 };
 
 const defaultClient = {
-  issues: {
-    addLabels: jest
-      .fn()
-      .mockName('github.issues.addLabels')
-      .mockImplementation(() => {
-        return;
-      }),
-  },
-  pulls: {
-    create: jest
-      .fn()
-      .mockName('github.pulls.create')
-      .mockImplementation(() => {
-        return { data: { number: 42 } };
-      }),
-    list: jest
-      .fn()
-      .mockName('github.pulls.list')
-      .mockImplementation((args) => {
-        const page = args.page - 1,
-          perPage = args.per_page;
-        return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
-      }),
-    listFiles: jest
-      .fn()
-      .mockName('github.pulls.listFiles')
-      .mockImplementation((args) => {
-        const prNumber = args.pull_number;
-        return { data: prFiles[prNumber] };
-      }),
-    merge: jest.fn().mockName('github.pulls.merge'),
-  },
-  repos: {
-    getContent: jest
-      .fn()
-      .mockName('github.repos.getContent')
-      .mockImplementation((args) => {
-        const path = args.path;
-        return { data: files[path] };
-      }),
+  rest: {
+    issues: {
+      addLabels: jest
+        .fn()
+        .mockName('github.issues.addLabels')
+        .mockImplementation(() => {
+          return;
+        }),
+    },
+    pulls: {
+      create: jest
+        .fn()
+        .mockName('github.pulls.create')
+        .mockImplementation(() => {
+          return { data: { number: 42 } };
+        }),
+      list: jest
+        .fn()
+        .mockName('github.pulls.list')
+        .mockImplementation((args) => {
+          const page = args.page - 1,
+            perPage = args.per_page;
+          return { data: PRs.slice(page * perPage, (page + 1) * perPage) };
+        }),
+      listFiles: jest
+        .fn()
+        .mockName('github.pulls.listFiles')
+        .mockImplementation((args) => {
+          const prNumber = args.pull_number;
+          return { data: prFiles[prNumber] };
+        }),
+      merge: jest.fn().mockName('github.pulls.merge'),
+    },
+    repos: {
+      getContent: jest
+        .fn()
+        .mockName('github.repos.getContent')
+        .mockImplementation((args) => {
+          const path = args.path;
+          return { data: files[path] };
+        }),
+    },
   },
 };
 
 const patchReleaseClient = _.cloneDeep(defaultClient);
-patchReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+patchReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[4]] };
 });
 
 const minorReleaseClient = _.cloneDeep(defaultClient);
-minorReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+minorReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[1]] };
 });
 
 const majorReleaseClient = _.cloneDeep(defaultClient);
-majorReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+majorReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[16]] };
 });
 
 const addAndUpdateReleaseClient = _.cloneDeep(defaultClient);
-addAndUpdateReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+addAndUpdateReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return {
     data: [PRs[1], PRs[2], PRs[14]],
   };
 });
 
 const addAndRemoveReleaseClient = _.cloneDeep(defaultClient);
-addAndRemoveReleaseClient.pulls.list = jest.fn().mockImplementation(() => {
+addAndRemoveReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return {
     data: [PRs[1], PRs[14], PRs[16]],
   };
 });
 
 const addRemoveAndUpdateReleaseClient = _.cloneDeep(defaultClient);
-addRemoveAndUpdateReleaseClient.pulls.list = jest
+addRemoveAndUpdateReleaseClient.rest.pulls.list = jest
   .fn()
   .mockImplementation(() => {
     return {

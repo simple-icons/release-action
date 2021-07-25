@@ -1,5 +1,4 @@
 import alphaSort from 'alpha-sort';
-import moment from 'moment';
 import semverInc from 'semver/functions/inc';
 
 const IGNORE_PRS = [5838, 5847];
@@ -213,8 +212,8 @@ async function getFilesSinceLastRelease(core, client, context) {
       if (isReleasePr(pr)) {
         // Previous release, earlier changes definitely already released
         core.info(`found previous release, PR #${pr.number}`);
-        return files.filter((file) =>
-          moment(file.merged_at).isAfter(pr.merged_at)
+        return files.filter(
+          (file) => new Date(file.merged_at) >= new Date(pr.merged_at)
         );
       }
 

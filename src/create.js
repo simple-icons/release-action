@@ -1,7 +1,7 @@
 import alphaSort from 'alpha-sort';
 import semverInc from 'semver/functions/inc';
 
-const IGNORE_PRS = [5838, 5847];
+const IGNORE_PRS = [6296, 6298];
 
 const BASE64 = 'base64';
 const UTF8 = 'utf-8';

@@ -50,7 +50,7 @@ test.each(['OWNER', 'MEMBER'])(
 
     await mergeOnApprove(core, client, github.context);
     expect(client.rest.pulls.merge).toHaveBeenCalled();
-  }
+  },
 );
 
 test.each([

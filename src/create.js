@@ -115,7 +115,7 @@ async function getPrFile(client, context, path, ref) {
     const fileDetails = fileContents.data[0] || fileContents.data;
     _ghFileCache[path + ref] = decode(
       fileDetails.content,
-      fileDetails.encoding
+      fileDetails.encoding,
     );
   }
 
@@ -136,7 +136,7 @@ async function* getPrFiles(core, client, context, prNumber) {
           client,
           context,
           fileInfo.filename,
-          REF_DEVELOP
+          REF_DEVELOP,
         ),
         patch: fileInfo.patch,
         path: fileInfo.filename,
@@ -144,7 +144,7 @@ async function* getPrFiles(core, client, context, prNumber) {
       };
     } catch (err) {
       core.warning(
-        `${fileInfo.status} file not found on ${REF_DEVELOP} ('${fileInfo.filename}'): ${err}`
+        `${fileInfo.status} file not found on ${REF_DEVELOP} ('${fileInfo.filename}'): ${err}`,
       );
     }
   }
@@ -156,7 +156,7 @@ async function* getPrFiles(core, client, context, prNumber) {
           client,
           context,
           fileInfo.filename,
-          REF_MASTER
+          REF_MASTER,
         ),
         patch: fileInfo.patch,
         path: fileInfo.filename,
@@ -164,7 +164,7 @@ async function* getPrFiles(core, client, context, prNumber) {
       };
     } catch (err) {
       core.warning(
-        `removed file not found on ${REF_MASTER} ('${fileInfo.filename}'): ${err}`
+        `removed file not found on ${REF_MASTER} ('${fileInfo.filename}'): ${err}`,
       );
     }
   }
@@ -213,7 +213,7 @@ async function getFilesSinceLastRelease(core, client, context) {
         // Previous release, earlier changes definitely already released
         core.info(`found previous release, PR #${pr.number}`);
         return files.filter(
-          (file) => new Date(file.merged_at) >= new Date(pr.merged_at)
+          (file) => new Date(file.merged_at) >= new Date(pr.merged_at),
         );
       }
 
@@ -314,7 +314,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     }
   }
   updatedIcons = updatedIcons.filter(
-    (a) => !removeFromUpdated.some((b) => a.id === b.id)
+    (a) => !removeFromUpdated.some((b) => a.id === b.id),
   );
 
   // An added icon was removed before the release
@@ -329,10 +329,10 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     }
   }
   newIcons = newIcons.filter(
-    (a) => !removeFromAdded.some((b) => a.id === b.id)
+    (a) => !removeFromAdded.some((b) => a.id === b.id),
   );
   removedIcons = removedIcons.filter(
-    (a) => !removeFromRemoved.some((b) => a.id === b.id)
+    (a) => !removeFromRemoved.some((b) => a.id === b.id),
   );
 
   // An updated icon was removed before the release
@@ -345,7 +345,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     }
   }
   updatedIcons = updatedIcons.filter(
-    (a) => !removeFromUpdated.some((b) => a.id === b.id)
+    (a) => !removeFromUpdated.some((b) => a.id === b.id),
   );
 
   // An updated icon was updated multiple times
@@ -360,7 +360,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
 
       if (otherIcon.name === updatedIcon.name) {
         const otherPrNumbers = otherIcon.prNumbers.filter(
-          (prNumber) => !updatedIcon.prNumbers.includes(prNumber)
+          (prNumber) => !updatedIcon.prNumbers.includes(prNumber),
         );
         updatedIcon.prNumbers.push(...otherPrNumbers);
         removeFromUpdated.push(otherIcon);
@@ -368,7 +368,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     }
   }
   updatedIcons = updatedIcons.filter(
-    (a) => !removeFromUpdated.some((b) => a.id === b.id)
+    (a) => !removeFromUpdated.some((b) => a.id === b.id),
   );
 
   return [newIcons, updatedIcons, removedIcons];
@@ -388,7 +388,7 @@ async function getNextVersionNumber(client, context, changes) {
     client,
     context,
     PACKAGE_FILE,
-    REF_MASTER
+    REF_MASTER,
   );
   const packageJson = JSON.parse(packageJsonFile);
 
@@ -476,7 +476,7 @@ async function createReleasePr(core, client, context, title, body) {
     title,
     body,
     BRANCH_DEVELOP,
-    BRANCH_MASTER
+    BRANCH_MASTER,
   );
   core.info(`\nNew release PR is: ${prNumber}`);
 
@@ -514,7 +514,7 @@ async function makeRelease(core, client, context) {
   const [newIcons, updatedIcons, removedIcons] = await getChanges(
     core,
     client,
-    context
+    context,
   );
   if (
     newIcons.length === 0 &&
@@ -537,7 +537,7 @@ async function makeRelease(core, client, context) {
     newVersion,
     newIcons,
     updatedIcons,
-    removedIcons
+    removedIcons,
   );
 
   await createReleasePr(core, client, context, releaseTitle, releaseNotes);

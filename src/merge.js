@@ -39,7 +39,7 @@ async function mergeOnApprove(core, client, context) {
   const review = payload.review;
   if (review.state !== APPROVED) {
     core.info(
-      `Review '${review.state}' won't trigger a release. '${APPROVED}' is required`
+      `Review '${review.state}' won't trigger a release. '${APPROVED}' is required`,
     );
     return;
   }
@@ -47,7 +47,7 @@ async function mergeOnApprove(core, client, context) {
   const association = review.author_association;
   if (!VALID_ASSOCIATIONS.includes(association)) {
     core.info(
-      `Reviewer does not have credentials to release (was '${association}')`
+      `Reviewer does not have credentials to release (was '${association}')`,
     );
     return;
   }

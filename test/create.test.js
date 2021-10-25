@@ -41,7 +41,7 @@ beforeEach(() => {
 test('run action - no errors', async () => {
   expect.assertions(1);
   await expect(
-    makeRelease(core, client, github.context)
+    makeRelease(core, client, github.context),
   ).resolves.not.toBeDefined();
 });
 
@@ -62,11 +62,11 @@ test.each([
       repo: expect.any(String),
       title: expect.any(String),
       body: expect.stringContaining(
-        `The new version will be: **v${expectedVersion}**`
+        `The new version will be: **v${expectedVersion}**`,
       ),
       head: expect.any(String),
       base: expect.any(String),
-    })
+    }),
   );
 });
 
@@ -92,7 +92,7 @@ test.each([
       body: expect.any(String),
       head: expect.any(String),
       base: expect.any(String),
-    })
+    }),
   );
 });
 
@@ -109,7 +109,7 @@ test('correct release notes', async () => {
       body: expectedNotes,
       head: expect.any(String),
       base: expect.any(String),
-    })
+    }),
   );
 });
 
@@ -126,6 +126,6 @@ test('correct Pull Request settings', async () => {
       body: expect.any(String),
       head: 'develop',
       base: 'master',
-    })
+    }),
   );
 });

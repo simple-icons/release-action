@@ -4,11 +4,11 @@ import _ from 'lodash';
 
 const packageJsonUrl = new URL(
   '../../test/fixtures/package.json',
-  import.meta.url
+  import.meta.url,
 );
 const simpleIconsUrl = new URL(
   '../../test/fixtures/simple-icons.json',
-  import.meta.url
+  import.meta.url,
 );
 const svgsUrl = new URL('../../test/fixtures/svgs.json', import.meta.url);
 

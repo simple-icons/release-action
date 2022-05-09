@@ -507,6 +507,8 @@ async function getChanges(core, client, context) {
     i = i + 1;
 
     const items = getChangesFromFile(core, file, i);
+    core.debug(`[create:getChanges] items: ${JSON.stringify(items, null, 2)}`);
+
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);

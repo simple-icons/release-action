@@ -14,6 +14,7 @@ Also consider the following, this Action is tailor-made for [Simple Icons] and c
 
 * [Building](#building)
 * [Release process](#release-process)
+* [Live debugging](#live-debugging)
 
 ## Building
 
@@ -24,10 +25,10 @@ Therefore, you should make sure the `npm run build` command does not fail due to
 ## Release process
 
 1. Once a week, [a scheduled workflow][create-release-workflow] is executed in the [simple-icons repository] that triggers this action with a [`schedule` event].
-2. The action creates a pull request adding the [release tag] to it trying to merge all new changes from [develop branch] into [master branch].
-3. Once a maintainer approves the pull request, a [workflow][merge release workflow] is executed in the [simple-icons repository] that triggers this action with a [`pull_request_review` event].
-4. The action merges the pull request into the [master branch].
-5. Release is created when a [`push` event] triggers the [publish workflow] in the [simple-icons repository].
+1. The action creates a pull request adding the [release tag] to it trying to merge all new changes from [develop branch] into [master branch].
+1. Once a maintainer approves the pull request, a [workflow][merge release workflow] is executed in the [simple-icons repository] that triggers this action with a [`pull_request_review` event].
+1. The action merges the pull request into the [master branch].
+1. Release is created when a [`push` event] triggers the [publish workflow] in the [simple-icons repository].
 
 ```mermaid
 gantt
@@ -41,6 +42,38 @@ gantt
     Action merges pull request (4)  :02:00, 0min
     Release is created (5)          :02:04, 0min
 ```
+
+## Live debugging
+
+You'll commonly want to debug the *src/create.js* file because there is the logic to create release pull requests. Currently the tests are mocked, but in order to debug in a real environment, you can follow the next steps:
+
+1. Fork this repository and create a new branch as is explained in [Contributing to this GitHub Action](#contributing-to-this-github-action).
+1. Create a repository, for example I've created one in my account named `si-release-action-debug`.
+1. Create a workflow file at `.github/workflows/create-release.yml` with the next content:
+
+   ```yaml
+   name: Create Release Pull Request
+   on:
+     pull_request:
+     workflow_dispatch:
+
+   jobs:
+     debug-context:    
+       name: Debug event
+       runs-on: ubuntu-latest
+       steps:
+       - name: Print GitHub context
+         env:
+           GITHUB_CONTEXT: ${{ toJson(github) }}
+         run: echo "$GITHUB_CONTEXT"
+     release-pr:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: mondeja/release-action@debug-3rd-party
+           name: Create release pull request
+           with:
+             repo-token: ${{ secrets.GITHUB_TOKEN }}
+   ```
 
 [Simple Icons]: https://github.com/simple-icons/simple-icons
 [simple-icons repository]: https://github.com/simple-icons/simple-icons

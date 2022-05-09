@@ -23,11 +23,11 @@ Therefore, you should make sure the `npm run build` command does not fail due to
 
 ## Release process
 
-1. Once a week, [a scheduled workflow][create-release-workflow] is executed in the [simple-icons repository] that triggers this action with a [schedule event].
+1. Once a week, [a scheduled workflow][create-release-workflow] is executed in the [simple-icons repository] that triggers this action with a [`schedule` event].
 2. The action creates a pull request adding the [release tag] to it trying to merge all new changes from [develop branch] into [master branch].
-3. Once a maintainer approves the pull request, a [workflow][merge release workflow] is executed in the [simple-icons repository] that triggers this action with a [pull_request_review event].
+3. Once a maintainer approves the pull request, a [workflow][merge release workflow] is executed in the [simple-icons repository] that triggers this action with a [`pull_request_review` event].
 4. The action merges the pull request into the [master branch].
-5. Release is created when a [push event] triggers the [publish workflow] in the [simple-icons repository].
+5. Release is created when a [`push` event] triggers the [publish workflow] in the [simple-icons repository].
 
 ```mermaid
 gantt
@@ -46,9 +46,9 @@ gantt
 [simple-icons repository]: https://github.com/simple-icons/simple-icons
 [create-release-workflow]: https://github.com/simple-icons/simple-icons/blob/4867c03d69d851500584ae42ad2d7c544b4cdb27/.github/workflows/create-release.yml
 [merge-release-workflow]: https://github.com/simple-icons/simple-icons/blob/4867c03d69d851500584ae42ad2d7c544b4cdb27/.github/workflows/merge-release.yml
-[schedule event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
-[pull_request_review event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_review
-[push event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
+[`schedule` event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+[`pull_request_review` event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_review
+[`push` event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
 [release tag]: https://github.com/simple-icons/simple-icons/pulls?q=label%3Arelease
 [develop branch]: https://github.com/simple-icons/simple-icons/tree/develop
 [master branch]: https://github.com/simple-icons/simple-icons/tree/master

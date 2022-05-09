@@ -285,6 +285,13 @@ function getChangesFromFile(core, file, id) {
     const changes = [];
 
     const sourceChanges = [...file.patch.matchAll(JSON_CHANGE_EXPR)];
+    core.debug(
+      `[create:getChangesFromFile - isSimpleIconsDataFile] sourceChanges: ${JSON.stringify(
+        sourceChanges,
+        null,
+        2,
+      )}`,
+    );
     for (let sourceChange of sourceChanges) {
       const name = sourceChange[1];
       changes.push({

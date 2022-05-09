@@ -79,6 +79,10 @@ function prNumbersToString(prNumbers) {
   return prNumbers.map((prNumber) => `#${prNumber}`).join(', ');
 }
 
+function stringifyJson(object) {
+  return JSON.stringify(object, null, 2);
+}
+
 // GitHub API
 async function addLabels(client, context, issueNumber, labels) {
   await client.rest.issues.addLabels({
@@ -128,6 +132,7 @@ async function* getPrFiles(core, client, context, prNumber) {
     repo: context.repo.repo,
     pull_number: prNumber,
   });
+  core.debug(`[create:getPrFiles] files: ${stringifyJson(files)}`);
 
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
     try {
@@ -195,6 +200,7 @@ async function getFilesSinceLastRelease(core, client, context) {
       per_page: perPage,
       page: page,
     });
+    core.debug(`[create:getFilesSinceLastRelease] prs: ${stringifyJson(prs)}`);
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
     for (let pr of prs) {
@@ -281,6 +287,11 @@ function getChangesFromFile(core, file, id) {
     const changes = [];
 
     const sourceChanges = [...file.patch.matchAll(JSON_CHANGE_EXPR)];
+    core.debug(
+      `[create:getChangesFromFile - isSimpleIconsDataFile] sourceChanges: ${stringifyJson(
+        sourceChanges,
+      )}`,
+    );
     for (let sourceChange of sourceChanges) {
       const name = sourceChange[1];
       changes.push({
@@ -496,6 +507,8 @@ async function getChanges(core, client, context) {
     i = i + 1;
 
     const items = getChangesFromFile(core, file, i);
+    core.debug(`[create:getChanges] items: ${stringifyJson(items)}`);
+
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);
@@ -507,6 +520,13 @@ async function getChanges(core, client, context) {
     }
   }
 
+  core.debug(`[create:getChanges] newIcons: ${stringifyJson(newIcons)}`);
+  core.debug(
+    `[create:getChanges] updatedIcons: ${stringifyJson(updatedIcons)}`,
+  );
+  core.debug(
+    `[create:getChanges] removedIcons: ${stringifyJson(removedIcons)}`,
+  );
   return filterDuplicates(newIcons, updatedIcons, removedIcons);
 }
 

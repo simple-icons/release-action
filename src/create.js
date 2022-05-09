@@ -1,5 +1,5 @@
 import alphaSort from 'alpha-sort';
-import semverInc from 'semver/functions/inc';
+import semverInc from 'semver/functions/inc.js';
 
 const IGNORE_PRS = [6296, 6298];
 
@@ -30,10 +30,11 @@ const REF_MASTER = 'master';
 const RELEASE_LABEL = 'release';
 
 const SVG_TITLE_EXPR = /<title>(.*)<\/title>/;
-const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
 
 const OUTPUT_DID_CREATE_PR_NAME = 'did-create-pr';
 const OUTPUT_NEW_VERSION_NAME = 'new-version';
+
+const _ghFileCache = {};
 
 // Helper functions
 function decode(data, encoding) {
@@ -79,6 +80,63 @@ function prNumbersToString(prNumbers) {
   return prNumbers.map((prNumber) => `#${prNumber}`).join(', ');
 }
 
+function stringifyJson(object) {
+  return JSON.stringify(object, null, 2);
+}
+
+/**
+ * Detect icons updated giving a data file unified diff.
+ */
+async function detectUpdatesInDataFileUnifiedDiff(diff, client, context) {
+  const siDataFile = await getPrFile(client, context, SI_DATA_FILE, REF_MASTER);
+  const siDataFileLines = siDataFile.split('\n');
+  const diffLines = diff.split('\n');
+
+  const updatedIcons = [];
+  let diffPartFromLine,
+    diffPartToLine,
+    linesAfterDoubleArroba = 0;
+
+  // for each line of the unified diff, get @@ meta to detect start
+  // and then when an update is found iterate backwards to find the title
+  // of the updated icon
+  for (const diffLine of diffLines) {
+    if (diffLine.startsWith('@@')) {
+      [diffPartFromLine, diffPartToLine] = diffLine
+        .split(' ')[1]
+        .split(',')
+        .map((num) => Math.abs(parseInt(num)));
+      linesAfterDoubleArroba = 0;
+    } else if (
+      (diffLine.startsWith('+') || diffLine.startsWith('-')) &&
+      diffLine.includes('            ')
+    ) {
+      // update found, iterate backwards from the line of the update
+      //
+      // 1-based index
+      let nCurrentLine = diffPartFromLine + linesAfterDoubleArroba;
+      while (nCurrentLine > 2) {
+        const siDataLine = siDataFileLines[nCurrentLine - 1];
+        if (siDataLine.includes('"title": "')) {
+          const title = siDataLine.split('"')[3];
+          if (!updatedIcons.includes(title)) {
+            updatedIcons.push(title);
+          }
+          break;
+        } else if (siDataLine.includes('        }')) {
+          break;
+        } else {
+          nCurrentLine--;
+        }
+      }
+    } else {
+      linesAfterDoubleArroba++;
+    }
+  }
+
+  return updatedIcons;
+}
+
 // GitHub API
 async function addLabels(client, context, issueNumber, labels) {
   await client.rest.issues.addLabels({
@@ -102,7 +160,6 @@ async function createPullRequest(client, context, title, body, head, base) {
   return data.number;
 }
 
-const _ghFileCache = {};
 async function getPrFile(client, context, path, ref) {
   if (_ghFileCache[path + ref] === undefined) {
     const fileContents = await client.rest.repos.getContent({
@@ -128,6 +185,7 @@ async function* getPrFiles(core, client, context, prNumber) {
     repo: context.repo.repo,
     pull_number: prNumber,
   });
+  core.debug(`[create:getPrFiles] files: ${stringifyJson(files)}`);
 
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
     try {
@@ -195,6 +253,7 @@ async function getFilesSinceLastRelease(core, client, context) {
       per_page: perPage,
       page: page,
     });
+    core.debug(`[create:getFilesSinceLastRelease] prs: ${stringifyJson(prs)}`);
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
     for (let pr of prs) {
@@ -280,13 +339,22 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    const sourceChanges = [...file.patch.matchAll(JSON_CHANGE_EXPR)];
-    for (let sourceChange of sourceChanges) {
-      const name = sourceChange[1];
+    const updatedIconsTitles = detectUpdatesInDataFileUnifiedDiff(
+      file.patch,
+      client,
+      context,
+    );
+    core.debug(
+      `[create:getChangesFromFile - isSimpleIconsDataFile] updatedIconsTitles: ${stringifyJson(
+        updatedIconsTitles,
+      )}`,
+    );
+
+    for (const title of updatedIconsTitles) {
       changes.push({
-        id: id + name,
+        id: id + title,
         changeType: CHANGE_TYPE_UPDATE,
-        name: name,
+        name: title,
         prNumbers: [file.prNumber],
       });
     }
@@ -496,6 +564,8 @@ async function getChanges(core, client, context) {
     i = i + 1;
 
     const items = getChangesFromFile(core, file, i);
+    core.debug(`[create:getChanges] items: ${stringifyJson(items)}`);
+
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);
@@ -507,6 +577,13 @@ async function getChanges(core, client, context) {
     }
   }
 
+  core.debug(`[create:getChanges] newIcons: ${stringifyJson(newIcons)}`);
+  core.debug(
+    `[create:getChanges] updatedIcons: ${stringifyJson(updatedIcons)}`,
+  );
+  core.debug(
+    `[create:getChanges] removedIcons: ${stringifyJson(removedIcons)}`,
+  );
   return filterDuplicates(newIcons, updatedIcons, removedIcons);
 }
 

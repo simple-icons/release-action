@@ -94,7 +94,6 @@ async function detectUpdatesInDataFileUnifiedDiff(diff, client, context) {
 
   const updatedIcons = [];
   let diffPartFromLine,
-    diffPartToLine,
     linesAfterDoubleArroba = 0;
 
   // for each line of the unified diff, get @@ meta to detect start
@@ -102,10 +101,9 @@ async function detectUpdatesInDataFileUnifiedDiff(diff, client, context) {
   // of the updated icon
   for (const diffLine of diffLines) {
     if (diffLine.startsWith('@@')) {
-      [diffPartFromLine, diffPartToLine] = diffLine
-        .split(' ')[1]
-        .split(',')
-        .map((num) => Math.abs(parseInt(num)));
+      diffPartFromLine = Math.abs(
+        parseInt(diffLine.split(' ')[1].split(',')[0]),
+      );
       linesAfterDoubleArroba = 0;
     } else if (
       (diffLine.startsWith('+') || diffLine.startsWith('-')) &&

@@ -35,11 +35,11 @@ gantt
     dateFormat HH:mm
     axisFormat %H:%M
     Scheduled release (1)           :00:00, 0min
-    Action creates pull request (2) :00:07, 0min
-    Pull request waits for approval :00:02, 4h
-    Maintainer approves (3)         :03:56, 0min
-    Action merges pull request (4)  :04:03, 0min
-    Release is created (5)          :04:10, 0min
+    Action creates pull request (2) :00:05, 0min
+    Pull request waits for approval :00:02, 2h
+    Maintainer approves (3)         :01:56, 0min
+    Action merges pull request (4)  :02:00, 0min
+    Release is created (5)          :02:04, 0min
 ```
 
 [Simple Icons]: https://github.com/simple-icons/simple-icons

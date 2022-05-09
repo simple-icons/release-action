@@ -292,7 +292,7 @@ async function getFilesSinceLastRelease(core, client, context) {
 }
 
 // Logic determining changes
-function getChangesFromFile(core, file, id) {
+function getChangesFromFile(core, file, id, client, context) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
     core.info(`Detected an icon was added ('${file.path}')`);
 
@@ -561,7 +561,7 @@ async function getChanges(core, client, context) {
   for (let file of files) {
     i = i + 1;
 
-    const items = getChangesFromFile(core, file, i);
+    const items = getChangesFromFile(core, file, i, client, context);
     core.debug(`[create:getChanges] items: ${stringifyJson(items)}`);
 
     for (let item of items) {

@@ -128,6 +128,7 @@ async function* getPrFiles(core, client, context, prNumber) {
     repo: context.repo.repo,
     pull_number: prNumber,
   });
+  core.debug(`[create:getPrFiles] files: ${JSON.stringify(files, null, 2)}`);
 
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
     try {
@@ -195,6 +196,9 @@ async function getFilesSinceLastRelease(core, client, context) {
       per_page: perPage,
       page: page,
     });
+    core.debug(
+      `[create:getFilesSinceLastRelease] prs: ${JSON.stringify(prs, null, 2)}`,
+    );
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
     for (let pr of prs) {

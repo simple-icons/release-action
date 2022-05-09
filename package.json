@@ -11,7 +11,7 @@
     "email": "ericornelissen@gmail.com"
   },
   "scripts": {
-    "build": "ncc build src/index.js -m -o lib",
+    "build": "ncc build src/index.js -o lib",
     "postbuild": "mv lib/index.js lib/index.cjs",
     "format": "prettier --write .",
     "lint": "prettier --check .",

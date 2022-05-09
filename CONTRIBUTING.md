@@ -58,22 +58,21 @@ You'll commonly want to debug the *src/create.js* file because there is the logi
      workflow_dispatch:
 
    jobs:
-     debug-context:    
-       name: Debug event
-       runs-on: ubuntu-latest
-       steps:
-       - name: Print GitHub context
-         env:
-           GITHUB_CONTEXT: ${{ toJson(github) }}
-         run: echo "$GITHUB_CONTEXT"
      release-pr:
        runs-on: ubuntu-latest
        steps:
-         - uses: mondeja/release-action@debug-3rd-party
+         - uses: <your-username>/release-action@<your-branch>
            name: Create release pull request
            with:
              repo-token: ${{ secrets.GITHUB_TOKEN }}
    ```
+
+   Don't forget to replace `<your-username>/release-action@<your-branch>` with your forked repository and branch.
+   
+1. Set a `ACTIONS_STEP_DEBUG` secret in the repository with the value `true` to enable debugging logs.
+1. Create and merge a first pull request with an icon and the data file like [mondeja/si-release-action-debug#2](https://github.com/mondeja/si-release-action-debug/pull/2/files).
+
+After this steps, you can push changes to the action into your branch at `<your-username>/release-action` and execute it opening pull requests in the repository created at the second step.
 
 [Simple Icons]: https://github.com/simple-icons/simple-icons
 [simple-icons repository]: https://github.com/simple-icons/simple-icons

@@ -96,9 +96,9 @@ async function detectUpdatesInDataFileUnifiedDiff(diff, client, context) {
   let diffPartFromLine,
     linesAfterDoubleArroba = 0;
 
-  // for each line of the unified diff, get @@ meta to detect start
-  // and then when an update is found iterate backwards to find the title
-  // of the updated icon
+  // for each line of the unified diff, get '@@' meta to detect update
+  // start lines and, when an update is found, iterate backwards to find
+  // the title of the updated icon
   for (const diffLine of diffLines) {
     if (diffLine.startsWith('@@')) {
       diffPartFromLine = Math.abs(
@@ -110,13 +110,13 @@ async function detectUpdatesInDataFileUnifiedDiff(diff, client, context) {
       diffLine.includes('            ')
     ) {
       // update found, iterate backwards from the line of the update
-      //
-      // 1-based index
-      let nCurrentLine = diffPartFromLine + linesAfterDoubleArroba;
+      let nCurrentLine = diffPartFromLine + linesAfterDoubleArroba - 1;
+
+      // here > 2 prevents to reach the beginning of the file
       while (nCurrentLine > 2) {
-        const siDataLine = siDataFileLines[nCurrentLine - 1];
+        const siDataLine = siDataFileLines[nCurrentLine];
         if (siDataLine.includes('"title": "')) {
-          const title = siDataLine.split('"')[3];
+          const title = siDataLine.split('"').slice(3, -1).join('"');
           if (!updatedIcons.includes(title)) {
             updatedIcons.push(title);
           }

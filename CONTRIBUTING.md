@@ -28,7 +28,7 @@ Therefore, you should make sure the `npm run build` command does not fail due to
 1. The action creates a pull request adding the [release tag] to it trying to merge all new changes from [develop branch] into [master branch].
 1. Once a maintainer approves the pull request, a [workflow][merge release workflow] is executed in the [simple-icons repository] that triggers this action with a [`pull_request_review` event].
 1. The action merges the pull request into the [master branch].
-1. Release is created when a [`push` event] triggers the [publish workflow] in the [simple-icons repository].
+1. A new release is created when a [`push` event] triggers the [publish workflow] in the [simple-icons repository].
 
 ```mermaid
 gantt
@@ -45,10 +45,10 @@ gantt
 
 ## Live debugging
 
-You'll commonly want to debug the *src/create.js* file because there is the logic to create release pull requests. Currently the tests are mocked, but in order to debug in a real environment, you can follow the next steps:
+You'll commonly want to debug the *src/create.js* file because includes the logic to create pull requests for new releases. Currently the tests located as *test/* directory are mocked, but in order to debug in a real environment, you can follow the next steps:
 
 1. Fork this repository and create a new branch as is explained in [Contributing to this GitHub Action](#contributing-to-this-github-action).
-1. Create a repository, for example I've created one in my account named `si-release-action-debug`.
+1. Create another separate repository, for example I've created [si-release-action-debug].
 1. Create a workflow file at `.github/workflows/create-release.yml` with the next content:
 
    ```yaml
@@ -85,3 +85,4 @@ After this steps, you can push changes to the action into your branch at `<your-
 [develop branch]: https://github.com/simple-icons/simple-icons/tree/develop
 [master branch]: https://github.com/simple-icons/simple-icons/tree/master
 [publish workflow]: https://github.com/simple-icons/simple-icons/blob/4867c03d69d851500584ae42ad2d7c544b4cdb27/.github/workflows/publish.yml
+[si-release-action-debug]: https://github.com/mondeja/si-release-action-debug

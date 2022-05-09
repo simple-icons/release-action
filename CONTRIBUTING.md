@@ -48,29 +48,29 @@ gantt
 You'll commonly want to debug the *src/create.js* file because includes the logic to create pull requests for new releases. Currently the tests located as *test/* directory are mocked, but in order to debug in a real environment, you can follow the next steps:
 
 1. Fork this repository and create a new branch as is explained in [Contributing to this GitHub Action](#contributing-to-this-github-action).
-1. Create another separate repository, for example I've created [si-release-action-debug].
-1. Create a workflow file at `.github/workflows/create-release.yml` with the next content:
+1. Create another separate repository, for example I've created [si-release-action-debug]. Inside this repository:
+   1. Create a workflow file at `.github/workflows/create-release.yml` with the next content:
 
-   ```yaml
-   name: Create Release Pull Request
-   on:
-     pull_request:
-     workflow_dispatch:
+      ```yaml
+      name: Create Release Pull Request
+      on:
+        pull_request:
+        workflow_dispatch:
 
-   jobs:
-     release-pr:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: <your-username>/release-action@<your-branch>
-           name: Create release pull request
-           with:
-             repo-token: ${{ secrets.GITHUB_TOKEN }}
-   ```
+      jobs:
+        release-pr:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: <your-username>/release-action@<your-branch>
+              name: Create release pull request
+              with:
+                repo-token: ${{ secrets.GITHUB_TOKEN }}
+      ```
 
-   Don't forget to replace `<your-username>/release-action@<your-branch>` with your forked repository and branch.
+      Don't forget to replace `<your-username>/release-action@<your-branch>` with your repository and branch forked in the first step.
    
-1. Set a `ACTIONS_STEP_DEBUG` secret in the repository with the value `true` to enable debugging logs.
-1. Create and merge a first pull request with an icon and the data file like [mondeja/si-release-action-debug#2](https://github.com/mondeja/si-release-action-debug/pull/2/files).
+   1. Set an `ACTIONS_STEP_DEBUG` secret in the settings with the value `true` to enable debugging logs.
+   1. Open and merge a first pull request with an icon and the data file like [mondeja/si-release-action-debug#2](https://github.com/mondeja/si-release-action-debug/pull/2/files).
 
 After this steps, you can push changes to the action into your branch at `<your-username>/release-action` and execute it opening pull requests in the repository created at the second step.
 

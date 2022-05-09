@@ -1,4 +1,3 @@
-module.exports = {
+export default {
   testEnvironment: 'jest-environment-node',
-  transform: {},
 };

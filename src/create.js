@@ -321,6 +321,9 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
+    console.log('file.content', file.content);
+    console.log('file.patch', file.patch);
+
     const updatedIconsTitles = detectUpdatesInDataFile(
       JSON.parse(file.content),
       JSON.parse(restorePreviousContentUsingDiff(file.content, file.patch)),

@@ -100,7 +100,12 @@ function restorePreviousContentUsingDiff(content, diff) {
   }
   const newDiff = newDiffLines.join('\n');
 
-  return applyPatch(content, newDiff);
+  console.log('newDiff', newDiff);
+
+  const response = applyPatch(content, newDiff);
+
+  console.log('response', response);
+  return response;
 }
 
 function detectUpdatesInDataFile(siDataFile, previousSiDataFile) {
@@ -324,9 +329,14 @@ function getChangesFromFile(core, file, id) {
     console.log('file.content', file.content);
     console.log('file.patch', file.patch);
 
+    const previousContent = restorePreviousContentUsingDiff(
+      file.content,
+      file.patch,
+    );
+    console.log("previousContent '", previousContent + "'");
     const updatedIconsTitles = detectUpdatesInDataFile(
       JSON.parse(file.content),
-      JSON.parse(restorePreviousContentUsingDiff(file.content, file.patch)),
+      JSON.parse(previousContent || '{ "icons": [] }'),
     );
     core.debug(
       `[create:getChangesFromFile - isSimpleIconsDataFile] updatedIconsTitles: ${stringifyJson(

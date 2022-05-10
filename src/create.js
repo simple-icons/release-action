@@ -79,7 +79,10 @@ function isSimpleIconsDataFile(path) {
 }
 
 function prNumbersToString(prNumbers) {
-  return prNumbers.map((prNumber) => `#${prNumber}`).join(', ');
+  return prNumbers
+    .sort((a, b) => a - b)
+    .map((prNumber) => `#${prNumber}`)
+    .join(', ');
 }
 
 function stringifyJson(object) {

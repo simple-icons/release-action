@@ -1,6 +1,7 @@
 import { jest } from '@jest/globals';
 import * as fs from 'fs';
 import _ from 'lodash';
+import { applyPatch } from 'diff';
 
 const packageJsonUrl = new URL(
   '../../test/fixtures/package.json',
@@ -24,6 +25,12 @@ const SI_DATA_FILE = '_data/simple-icons.json';
 const STATUS_ADDED = 'added';
 const STATUS_MODIFIED = 'modified';
 const STATUS_REMOVED = 'removed';
+
+const REF_DEVELOP = 'develop';
+const REF_MASTER = 'master';
+
+const JSON_CONTENTS_URL =
+  'https://api.github.com/repos/simple-icons/simple-icons/contents/_data%2Fsimple-icons.json';
 
 function encode(data, encoding) {
   if (encoding === BASE64) {
@@ -153,6 +160,7 @@ const prFiles = {
       filename: 'icons/foo.svg',
       status: STATUS_ADDED,
       patch: '+' + svgs['foo.svg'],
+      contents_url: `${JSON_CONTENTS_URL}?ref=500`,
     },
   ],
   501: [
@@ -164,17 +172,19 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-+        {
-+            "title": "Foo",
-+            "hex": "000000",
-+            "source": "https://www.example.com/"
-+        },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -31,11 +31,6 @@
+       "source": "https://blog.feedly.com/wp-content/themes/feedly-2017-v1.19.3/assets/images/logos/logo.svg"
+     },
+     {
+-      "title": "Foo",
+-      "hex": "000000",
+-      "source": "https://www.example.com/"
+-    },
+-    {
+       "title": "Foobar",
+       "hex": "FFCB05",
+       "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=501`,
     },
   ],
   502: [
@@ -195,55 +205,50 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "1Password",
--            "hex": "0094F5",
-+            "hex": "363636",
-             "source": "https://1password.com/press/"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -2,7 +2,7 @@
+   "icons": [
+     {
+       "title": "1Password",
+-      "hex": "363636",
++      "hex": "0094F5",
+       "source": "https://1password.com/press/"
+     },
+     {`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=503`,
     },
   ],
   504: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "Adobe",
-             "hex": "FF0000",
--            "source": "https://www.adobe.com/"
-+            "source": "https://www.test.com/"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -18,7 +18,7 @@
+     {
+       "title": "Adobe",
+       "hex": "FF0000",
+-      "source": "https://www.adobe.com/"
++      "source": "https://www.test.com/"
+     },
+     {
+       "title": "Feedly",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=504`,
     },
   ],
   505: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "Mozilla",
--            "hex": "111000",
--            "source": "https://mozilla.com/our-logo"
-+            "hex": "000000",
-+            "source": "https://mozilla.ninja/our-logo"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -47,8 +47,8 @@
+     },
+     {
+       "title": "Mozilla",
+-      "hex": "000000",
+-      "source": "https://mozilla.ninja/our-logo"
++      "hex": "111000",
++      "source": "https://mozilla.com/our-logo"
+     },
+     {
+       "title": "Opera",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=505`,
     },
   ],
   506: [
@@ -255,18 +260,16 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "Postman",
--            "hex": "006C37",
-+            "hex": "FF6C37",
-             "source": "https://www.getpostman.com/resources/media-assets/"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -57,7 +57,7 @@
+     },
+     {
+       "title": "Postman",
+-      "hex": "006C37",
++      "hex": "FF6C37",
+       "source": "https://www.getpostman.com/resources/media-assets/"
+     }
+   ]`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=506`,
     },
   ],
   507: [
@@ -278,18 +281,16 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "Intel",
-             "hex": "0071C5",
--            "source": "https://www.intel.com/"
-+            "source": "https://www.intel.com"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -38,7 +38,7 @@
+     {
+       "title": "Intel",
+       "hex": "0071C5",
+-      "source": "https://www.intel.com"
++      "source": "https://www.intel.com/"
+     },
+     {
+       "title": "Jest",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=507`,
     },
   ],
   508: [
@@ -301,53 +302,51 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "AddThis",
--            "hex": "FF6559",
--            "source": "https://www.intel.com/"
-+            "hex": "FF6550",
-+            "source": "https://www.intel.com"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -38,7 +38,7 @@
+     {
+       "title": "Intel",
+       "hex": "0071C5",
+-      "source": "https://www.intel.com"
++      "source": "https://www.intel.com/"
+     },
+     {
+       "title": "Jest",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=508`,
     },
   ],
   509: [
     {
       filename: 'icons/jest.svg',
       status: STATUS_ADDED,
-      patch: '+' + svgs['jest.svg'],
+      patch: '+' + svgs['acm.svg'],
     },
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-         {
-             "title": "Abstract",
--            "hex": "AAAAAA",
--            "source": "https://www.ABSTRACT.com/about/"
-+            "hex": "191A1B",
-+            "source": "https://www.abstract.com/about/"
-         },
-         {
-             "title": "Hello world",
-             "hex": "FF6550",
-             "source": "https://www.intel.com"
-+        },
-+        {
-+            "title": "Jest",
-+            "hex": "C21325",
-+            "source": "https://jestjs.io/"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -2,8 +2,8 @@
+   "icons": [
+     {
+       "title": "1Password",
+-      "hex": "363636",
+-      "source": "https://1password.com/press/"
++      "hex": "000000",
++      "source": "https://1password.com/"
+     },
+     {
+       "title": "500px",
+@@ -11,6 +11,11 @@
+       "source": "https://about.500px.com/press"
+     },
+     {
++      "title": "ACM",
++      "hex": "0085CA",
++      "source": "http://identitystandards.acm.org/"
++    },
++    {
+       "title": "AddThis",
+       "hex": "FF6550",
+       "source": "http://www.addthis.com/"`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=509`,
     },
   ],
   510: [
@@ -364,31 +363,35 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-+        },
-+        {
-+            "title": "WordPress",
-+            "hex": "21759B",
-+            "source": "https://wordpress.org/about/logos"
-         },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -59,6 +59,11 @@
+       "title": "Postman",
+       "hex": "006C37",
+       "source": "https://www.getpostman.com/resources/media-assets/"
++    },
++    {
++      "title": "WordPress",
++      "hex": "21759B",
++      "source": "https://wordpress.org/about/logos"
+     }
+   ]
+ }`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=510`,
     },
   ],
   511: [
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"title": "Razer",
-              "hex": "00FF00",
-              "source": "https://en.wikipedia.org/wiki/File:Razer_snake_logo.svg"
-+           },...
--           },
-            {
-              "title": "React",
-              "hex": "61DAFB",`,
+      patch: `@@ -4,8 +4,7 @@
+       "title": "1Password",
+       "hex": "363636",
+       "source": "https://1password.com/press/"
+-    },
+-    {
++    },{
+       "title": "500px",
+       "hex": "0099E5",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=511`,
     },
   ],
   512: [
@@ -400,17 +403,19 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "FF0000",
-             "source": "https://www.adobe.com/"
-         },
-+        {
-+            "title": "bar",
-+            "hex": "FFFFFF",
-+            "source": "https://www.example.org/"
-+        },
-         {
-             "title": "Simple Icons",
-             "hex": "555555",`,
+      patch: `@@ -21,6 +21,11 @@
+       "source": "https://www.adobe.com/"
+     },
+     {
++      "title": "bar",
++      "hex": "FFFFFF",
++      "source": "https://www.example.org/"
++    },
++    {
+       "title": "Feedly",
+       "hex": "2BB24C",
+       "source": "https://blog.feedly.com/wp-content/themes/feedly-2017-v1.19.3/assets/images/logos/logo.svg"`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=512`,
     },
   ],
   513: [
@@ -422,17 +427,19 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "A9225C",
-             "source": "https://company-39138.frontify.com/d/7EKFm12NQSa8/accusoft-corporation-style-guide#/style-guide/logo"
-         },
-+        {
-+            "title": "ACM",
-+            "hex": "0085CA",
-+            "source": "http://identitystandards.acm.org/"
-+        },
-         {
-             "title": "ActiGraph",
-             "hex": "0B2C4A",`,
+      patch: `@@ -11,6 +11,11 @@
+       "source": "https://about.500px.com/press"
+     },
+     {
++      "title": "ACM",
++      "hex": "0085CA",
++      "source": "http://identitystandards.acm.org/"
++    },
++    {
+       "title": "AddThis",
+       "hex": "FF6550",
+       "source": "http://www.addthis.com/"`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=513`,
     },
   ],
   514: [
@@ -444,17 +451,19 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "F43E37",
-             "source": "https://blog.pocketcasts.com/press/"
-         },
-+        {
-+           "title": "Pokémon",
-+           "hex": "FFCB05",
-+           "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
-+        },
-         {
-             "title": "Poly",
-             "hex": "EB3C00",`,
+      patch: `@@ -56,6 +56,11 @@
+       "source": "https://github.com/operasoftware/logo"
+     },
+     {
++      "title": "Pokémon",
++      "hex": "FFCB05",
++      "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
++    },
++    {
+       "title": "Postman",
+       "hex": "006C37",
+       "source": "https://www.getpostman.com/resources/media-assets/"`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=514`,
     },
   ],
   515: [
@@ -466,20 +475,30 @@ const prFiles = {
     {
       filename: SI_DATA_FILE,
       status: STATUS_MODIFIED,
-      patch: `"hex": "F43E37",
-             "source": "https://blog.pocketcasts.com/press/"
-         },
--        {
--           "title": "Foobar",
--           "hex": "FFCB05",
--           "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
--        },
-         {
-             "title": "Poly",
-             "hex": "EB3C00",`,
+      patch: `@@ -31,11 +31,6 @@
+       "source": "https://blog.feedly.com/wp-content/themes/feedly-2017-v1.19.3/assets/images/logos/logo.svg"
+     },
+     {
+-      "title": "Foo",
+-      "hex": "000000",
+-      "source": "https://www.example.com/"
+-    },
+-    {
+       "title": "Foobar",
+       "hex": "FFCB05",
+       "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=515`,
     },
   ],
 };
+
+function getPatchFromPrPath(prNumber, path) {
+  const file = prFiles[prNumber].find((f) => f.filename === path);
+  if (!file) {
+    throw new Error(`Patch not found for file '${path}'`);
+  }
+  return file.patch;
+}
 
 const files = {
   'package.json': {
@@ -587,7 +606,23 @@ const defaultClient = {
         .fn()
         .mockName('github.repos.getContent')
         .mockImplementation((args) => {
-          const path = args.path;
+          const { path, ref } = args;
+          if (![REF_DEVELOP, REF_MASTER].includes(ref)) {
+            const content = Buffer.from(files[path].content, BASE64).toString(
+              UTF8,
+            );
+            const patch = getPatchFromPrPath(parseInt(ref), path);
+            if (!patch.startsWith('@@ ')) {
+              throw new Error("Unified diffs must start with '@@ '");
+            }
+
+            return {
+              data: {
+                content: encode(applyPatch(content, patch), BASE64),
+                encoding: BASE64,
+              },
+            };
+          }
           return { data: files[path] };
         }),
     },

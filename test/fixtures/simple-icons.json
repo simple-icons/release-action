@@ -11,11 +11,6 @@
       "source": "https://about.500px.com/press"
     },
     {
-      "title": "ACM",
-      "hex": "0085CA",
-      "source": "http://identitystandards.acm.org/"
-    },
-    {
       "title": "AddThis",
       "hex": "FF6550",
       "source": "http://www.addthis.com/"
@@ -23,7 +18,7 @@
     {
       "title": "Adobe",
       "hex": "FF0000",
-      "source": "https://www.test.com/"
+      "source": "https://www.adobe.com/"
     },
     {
       "title": "Feedly",
@@ -34,6 +29,11 @@
       "title": "Foo",
       "hex": "000000",
       "source": "https://www.example.com/"
+    },
+    {
+      "title": "Foobar",
+      "hex": "FFCB05",
+      "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
     {
       "title": "Intel",
@@ -56,19 +56,9 @@
       "source": "https://github.com/operasoftware/logo"
     },
     {
-      "title": "Pokémon",
-      "hex": "FFCB05",
-      "source": "https://commons.wikimedia.org/wiki/File:International_Pok%C3%A9mon_logo.svg"
-    },
-    {
       "title": "Postman",
-      "hex": "FF6C37",
+      "hex": "006C37",
       "source": "https://www.getpostman.com/resources/media-assets/"
-    },
-    {
-      "title": "WordPress",
-      "hex": "21759B",
-      "source": "https://wordpress.org/about/logos"
     }
   ]
 }

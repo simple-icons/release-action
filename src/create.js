@@ -36,7 +36,7 @@ const SVG_TITLE_EXPR = /<title>(.*)<\/title>/;
 const OUTPUT_DID_CREATE_PR_NAME = 'did-create-pr';
 const OUTPUT_NEW_VERSION_NAME = 'new-version';
 
-const _ghFileCache = {};
+let _ghFileCache;
 
 // Helper functions
 function decode(data, encoding) {
@@ -91,24 +91,18 @@ function stringifyJson(object) {
 
 function restorePreviousContentUsingDiff(content, diff) {
   const diffLines = diff.split('\n'),
-    newDiffLines = [];
+    revertedDiffLines = [];
   for (const diffLine of diffLines) {
     if (diffLine.startsWith('+')) {
-      newDiffLines.push(`-${diffLine.slice(1)}`);
+      revertedDiffLines.push(`-${diffLine.slice(1)}`);
     } else if (diffLine.startsWith('-')) {
-      newDiffLines.push(`+${diffLine.slice(1)}`);
+      revertedDiffLines.push(`+${diffLine.slice(1)}`);
     } else {
-      newDiffLines.push(diffLine);
+      revertedDiffLines.push(diffLine);
     }
   }
-  const newDiff = newDiffLines.join('\n');
 
-  console.log('newDiff', newDiff);
-
-  const response = applyPatch(content, newDiff);
-
-  console.log('response', response);
-  return response;
+  return applyPatch(content, revertedDiffLines.join('\n'));
 }
 
 function detectUpdatesInDataFile(siDataFile, previousSiDataFile) {
@@ -183,7 +177,7 @@ async function* getPrFiles(core, client, context, prNumber) {
           client,
           context,
           fileInfo.filename,
-          new URL(fileInfo.contents_url).searchParams.get('ref'),
+          REF_DEVELOP,
         ),
         patch: fileInfo.patch,
         path: fileInfo.filename,
@@ -329,18 +323,15 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    console.log('file.content', file.content);
-    console.log('file.patch', file.patch);
-
     const previousContent = restorePreviousContentUsingDiff(
       file.content,
       file.patch,
     );
-    console.log("previousContent '", previousContent + "'");
     const updatedIconsTitles = detectUpdatesInDataFile(
       JSON.parse(file.content),
       JSON.parse(previousContent || '{ "icons": [] }'),
     );
+
     core.debug(
       `[create:getChangesFromFile - isSimpleIconsDataFile] updatedIconsTitles: ${stringifyJson(
         updatedIconsTitles,
@@ -585,6 +576,9 @@ async function getChanges(core, client, context) {
 }
 
 async function makeRelease(core, client, context) {
+  // reset file caching in each execution for proper testing
+  _ghFileCache = {};
+
   const [newIcons, updatedIcons, removedIcons] = await getChanges(
     core,
     client,

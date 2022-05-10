@@ -321,10 +321,9 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    //
     const updatedIconsTitles = detectUpdatesInDataFile(
-      file.content,
-      restorePreviousContentUsingDiff(file.content, file.patch),
+      JSON.parse(file.content),
+      JSON.parse(restorePreviousContentUsingDiff(file.content, file.patch)),
     );
     core.debug(
       `[create:getChangesFromFile - isSimpleIconsDataFile] updatedIconsTitles: ${stringifyJson(

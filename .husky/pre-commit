@@ -3,6 +3,10 @@
 
 # Format the code base
 npm run format
+
+# Run tests
+npm test
+
 git add .
 
 # Compile into lib/

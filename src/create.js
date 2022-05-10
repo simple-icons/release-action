@@ -1,6 +1,6 @@
 import alphaSort from 'alpha-sort';
 import { applyPatch } from 'diff';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual.js';
 import semverInc from 'semver/functions/inc.js';
 
 const IGNORE_PRS = [6296, 6298];
@@ -109,7 +109,7 @@ function detectUpdatesInDataFile(siDataFile, previousSiDataFile) {
     const newIcon = siDataFile.icons.find(
       (icon) => icon.title === previousIcon.title,
     );
-    if (newIcon && !_.isEqual(previousIcon, newIcon)) {
+    if (newIcon && !isEqual(previousIcon, newIcon)) {
       updatedIconsTitles.push(newIcon.title);
     }
     // if `!newIcon` means that has been removed, ignore it

@@ -1,4 +1,6 @@
 import alphaSort from 'alpha-sort';
+import { applyPatch } from 'diff';
+import _ from 'lodash';
 import semverInc from 'semver/functions/inc.js';
 
 const IGNORE_PRS = [6296, 6298];
@@ -84,55 +86,36 @@ function stringifyJson(object) {
   return JSON.stringify(object, null, 2);
 }
 
-/**
- * Detect icons updated giving a data file unified diff.
- */
-async function detectUpdatesInDataFileUnifiedDiff(diff, client, context) {
-  const siDataFile = await getPrFile(client, context, SI_DATA_FILE, REF_MASTER);
-  const siDataFileLines = siDataFile.split('\n');
-  const diffLines = diff.split('\n');
-
-  const updatedIcons = [];
-  let diffPartFromLine,
-    linesAfterDoubleArroba = 0;
-
-  // for each line of the unified diff, get '@@' meta to detect update
-  // start lines and, when an update is found, iterate backwards to find
-  // the title of the updated icon
+function restorePreviousContentUsingDiff(content, diff) {
+  const diffLines = diff.split('\n'),
+    newDiffLines = [];
   for (const diffLine of diffLines) {
-    if (diffLine.startsWith('@@')) {
-      diffPartFromLine = Math.abs(
-        parseInt(diffLine.split(' ')[1].split(',')[0]),
-      );
-      linesAfterDoubleArroba = 0;
-    } else if (
-      (diffLine.startsWith('+') || diffLine.startsWith('-')) &&
-      diffLine.includes('            ')
-    ) {
-      // update found, iterate backwards from the line of the update
-      let nCurrentLine = diffPartFromLine + linesAfterDoubleArroba - 1;
-
-      // here > 2 prevents to reach the beginning of the file
-      while (nCurrentLine > 2) {
-        const siDataLine = siDataFileLines[nCurrentLine];
-        if (siDataLine.includes('"title": "')) {
-          const title = siDataLine.split('"').slice(3, -1).join('"');
-          if (!updatedIcons.includes(title)) {
-            updatedIcons.push(title);
-          }
-          break;
-        } else if (siDataLine.includes('        }')) {
-          break;
-        } else {
-          nCurrentLine--;
-        }
-      }
+    if (diffLine.startsWith('+')) {
+      newDiffLines.push(`-${diffLine.slice(1)}`);
+    } else if (diffLine.startsWith('-')) {
+      newDiffLines.push(`+${diffLine.slice(1)}`);
     } else {
-      linesAfterDoubleArroba++;
+      newDiffLines.push(diffLine);
     }
   }
+  const newDiff = newDiffLines.join('\n');
 
-  return updatedIcons;
+  return applyPatch(content, newDiff);
+}
+
+function detectUpdatesInDataFile(siDataFile, previousSiDataFile) {
+  const updatedIconsTitles = [];
+  for (const previousIcon of previousSiDataFile.icons) {
+    const newIcon = siDataFile.icons.find(
+      (icon) => icon.title === previousIcon.title,
+    );
+    if (newIcon && !_.isEqual(previousIcon, newIcon)) {
+      updatedIconsTitles.push(newIcon.title);
+    }
+    // if `!newIcon` means that has been removed, ignore it
+  }
+
+  return updatedIconsTitles;
 }
 
 // GitHub API
@@ -192,7 +175,7 @@ async function* getPrFiles(core, client, context, prNumber) {
           client,
           context,
           fileInfo.filename,
-          REF_DEVELOP,
+          new URL(fileInfo.contents_url).searchParams.get('ref'),
         ),
         patch: fileInfo.patch,
         path: fileInfo.filename,
@@ -227,8 +210,9 @@ async function* getPrFiles(core, client, context, prNumber) {
 
   const dataFile = files.find((file) => isSimpleIconsDataFile(file.filename));
   if (dataFile !== undefined) {
+    const ref = new URL(dataFile.contents_url).searchParams.get('ref');
     yield {
-      content: await getPrFile(client, context, dataFile.filename, REF_DEVELOP),
+      content: await getPrFile(client, context, dataFile.filename, ref),
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
@@ -292,7 +276,7 @@ async function getFilesSinceLastRelease(core, client, context) {
 }
 
 // Logic determining changes
-function getChangesFromFile(core, file, id, client, context) {
+function getChangesFromFile(core, file, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
     core.info(`Detected an icon was added ('${file.path}')`);
 
@@ -337,10 +321,10 @@ function getChangesFromFile(core, file, id, client, context) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    const updatedIconsTitles = detectUpdatesInDataFileUnifiedDiff(
-      file.patch,
-      client,
-      context,
+    //
+    const updatedIconsTitles = detectUpdatesInDataFile(
+      file.content,
+      restorePreviousContentUsingDiff(file.content, file.patch),
     );
     core.debug(
       `[create:getChangesFromFile - isSimpleIconsDataFile] updatedIconsTitles: ${stringifyJson(
@@ -561,7 +545,7 @@ async function getChanges(core, client, context) {
   for (let file of files) {
     i = i + 1;
 
-    const items = getChangesFromFile(core, file, i, client, context);
+    const items = getChangesFromFile(core, file, i);
     core.debug(`[create:getChanges] items: ${stringifyJson(items)}`);
 
     for (let item of items) {

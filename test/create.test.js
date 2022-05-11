@@ -19,12 +19,11 @@ The new version will be: **v2.0.0**
 
 # Updated Icons
 
-- 1Password (#503)
-- Abstract (#509)
+- 1Password (#503, #509, #516, #517, #518)
 - AddThis (#508)
 - Adobe (#504)
 - Feedly (#502)
-- Intel (#507)
+- Intel (#507, #508)
 - Mozilla (#505)
 - Opera (#510)
 - Postman (#506)
@@ -72,6 +71,8 @@ test.each([
 
 test.each([
   ['patch', 'Publish 1 updated icon'],
+  ['minor', 'Publish 1 new icon'],
+  ['major', 'Publish 1 removed icon'],
   ['add-and-update', 'Publish 2 new icons and 1 updated icon'],
   ['add-and-remove', 'Publish 2 new icons and 1 removed icon'],
   [

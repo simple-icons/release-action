@@ -1,17 +1,22 @@
 import alphaSort from 'alpha-sort';
-import semverInc from 'semver/functions/inc';
+import diffPatchsApplier from 'diff/lib/patch/apply.js';
+import isEqual from 'lodash/isEqual.js';
+import semverInc from 'semver/functions/inc.js';
+
+import {
+  BASE64,
+  UTF8,
+  REF_DEVELOP,
+  REF_MASTER,
+  SI_DATA_FILE,
+  STATUS_ADDED,
+  STATUS_MODIFIED,
+  STATUS_REMOVED,
+} from './constants.js';
 
 const IGNORE_PRS = [6296, 6298];
 
-const BASE64 = 'base64';
-const UTF8 = 'utf-8';
-
-const SI_DATA_FILE = '_data/simple-icons.json';
 const PACKAGE_FILE = 'package.json';
-
-const STATUS_ADDED = 'added';
-const STATUS_MODIFIED = 'modified';
-const STATUS_REMOVED = 'removed';
 
 const CHANGE_TYPE_ADD = 'new';
 const CHANGE_TYPE_UPDATE = 'update';
@@ -22,18 +27,14 @@ const RELEASE_PATCH = 'patch';
 const RELEASE_MINOR = 'minor';
 const RELEASE_MAJOR = 'major';
 
-const BRANCH_DEVELOP = 'develop';
-const BRANCH_MASTER = 'master';
-const REF_DEVELOP = 'develop';
-const REF_MASTER = 'master';
-
 const RELEASE_LABEL = 'release';
 
 const SVG_TITLE_EXPR = /<title>(.*)<\/title>/;
-const JSON_CHANGE_EXPR = /{\s*"title":\s*"(.*)",((?:\s-.*\s.*)|(?:\s.*\s-.*))/g;
 
 const OUTPUT_DID_CREATE_PR_NAME = 'did-create-pr';
 const OUTPUT_NEW_VERSION_NAME = 'new-version';
+
+let _ghFileCache;
 
 // Helper functions
 function decode(data, encoding) {
@@ -68,7 +69,7 @@ function isIconFile(path) {
 }
 
 function isReleasePr(pr) {
-  return pr.base.ref === BRANCH_MASTER;
+  return pr.base.ref === REF_MASTER;
 }
 
 function isSimpleIconsDataFile(path) {
@@ -76,11 +77,45 @@ function isSimpleIconsDataFile(path) {
 }
 
 function prNumbersToString(prNumbers) {
-  return prNumbers.map((prNumber) => `#${prNumber}`).join(', ');
+  return prNumbers
+    .sort((a, b) => a - b)
+    .map((prNumber) => `#${prNumber}`)
+    .join(', ');
 }
 
 function stringifyJson(object) {
   return JSON.stringify(object, null, 2);
+}
+
+function restorePreviousContentUsingDiff(content, diff) {
+  const diffLines = diff.split('\n'),
+    revertedDiffLines = [];
+  for (const diffLine of diffLines) {
+    if (diffLine.startsWith('+')) {
+      revertedDiffLines.push(`-${diffLine.slice(1)}`);
+    } else if (diffLine.startsWith('-')) {
+      revertedDiffLines.push(`+${diffLine.slice(1)}`);
+    } else {
+      revertedDiffLines.push(diffLine);
+    }
+  }
+
+  return diffPatchsApplier.applyPatch(content, revertedDiffLines.join('\n'));
+}
+
+function detectUpdatesInDataFile(siDataFile, previousSiDataFile) {
+  const updatedIconsTitles = [];
+  for (const previousIcon of previousSiDataFile.icons) {
+    const newIcon = siDataFile.icons.find(
+      (icon) => icon.title === previousIcon.title,
+    );
+    if (newIcon && !isEqual(previousIcon, newIcon)) {
+      updatedIconsTitles.push(newIcon.title);
+    }
+    // if `!newIcon` means that has been removed, ignore it
+  }
+
+  return updatedIconsTitles;
 }
 
 // GitHub API
@@ -106,7 +141,6 @@ async function createPullRequest(client, context, title, body, head, base) {
   return data.number;
 }
 
-const _ghFileCache = {};
 async function getPrFile(client, context, path, ref) {
   if (_ghFileCache[path + ref] === undefined) {
     const fileContents = await client.rest.repos.getContent({
@@ -176,8 +210,9 @@ async function* getPrFiles(core, client, context, prNumber) {
 
   const dataFile = files.find((file) => isSimpleIconsDataFile(file.filename));
   if (dataFile !== undefined) {
+    const ref = new URL(dataFile.contents_url).searchParams.get('ref');
     yield {
-      content: await getPrFile(client, context, dataFile.filename, REF_DEVELOP),
+      content: await getPrFile(client, context, dataFile.filename, ref),
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
@@ -286,18 +321,26 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    const sourceChanges = [...file.patch.matchAll(JSON_CHANGE_EXPR)];
+    const previousContent = restorePreviousContentUsingDiff(
+      file.content,
+      file.patch,
+    );
+    const updatedIconsTitles = detectUpdatesInDataFile(
+      JSON.parse(file.content),
+      JSON.parse(previousContent || '{ "icons": [] }'),
+    );
+
     core.debug(
-      `[create:getChangesFromFile - isSimpleIconsDataFile] sourceChanges: ${stringifyJson(
-        sourceChanges,
+      `[create:getChangesFromFile - isSimpleIconsDataFile] updatedIconsTitles: ${stringifyJson(
+        updatedIconsTitles,
       )}`,
     );
-    for (let sourceChange of sourceChanges) {
-      const name = sourceChange[1];
+
+    for (const title of updatedIconsTitles) {
       changes.push({
-        id: id + name,
+        id: id + title,
         changeType: CHANGE_TYPE_UPDATE,
-        name: name,
+        name: title,
         prNumbers: [file.prNumber],
       });
     }
@@ -486,8 +529,8 @@ async function createReleasePr(core, client, context, title, body) {
     context,
     title,
     body,
-    BRANCH_DEVELOP,
-    BRANCH_MASTER,
+    REF_DEVELOP,
+    REF_MASTER,
   );
   core.info(`\nNew release PR is: ${prNumber}`);
 
@@ -531,6 +574,9 @@ async function getChanges(core, client, context) {
 }
 
 async function makeRelease(core, client, context) {
+  // reset file caching in each execution for proper testing
+  _ghFileCache = {};
+
   const [newIcons, updatedIcons, removedIcons] = await getChanges(
     core,
     client,

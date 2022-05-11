@@ -3,17 +3,20 @@ import { applyPatch } from 'diff';
 import isEqual from 'lodash/isEqual.js';
 import semverInc from 'semver/functions/inc.js';
 
+import {
+  BASE64,
+  UTF8,
+  REF_DEVELOP,
+  REF_MASTER,
+  SI_DATA_FILE,
+  STATUS_ADDED,
+  STATUS_MODIFIED,
+  STATUS_REMOVED,
+} from './constants.js';
+
 const IGNORE_PRS = [6296, 6298];
 
-const BASE64 = 'base64';
-const UTF8 = 'utf-8';
-
-const SI_DATA_FILE = '_data/simple-icons.json';
 const PACKAGE_FILE = 'package.json';
-
-const STATUS_ADDED = 'added';
-const STATUS_MODIFIED = 'modified';
-const STATUS_REMOVED = 'removed';
 
 const CHANGE_TYPE_ADD = 'new';
 const CHANGE_TYPE_UPDATE = 'update';
@@ -23,9 +26,6 @@ const CHANGE_TYPE_IRRELEVANT = 'irrelevant';
 const RELEASE_PATCH = 'patch';
 const RELEASE_MINOR = 'minor';
 const RELEASE_MAJOR = 'major';
-
-const REF_DEVELOP = 'develop';
-const REF_MASTER = 'master';
 
 const RELEASE_LABEL = 'release';
 

@@ -1,4 +1,4 @@
-const REF_MASTER = 'master';
+import { REF_MASTER } from './constants.js';
 
 const APPROVED = 'approved';
 const VALID_ASSOCIATIONS = [

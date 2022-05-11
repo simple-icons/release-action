@@ -2,6 +2,16 @@ import { jest } from '@jest/globals';
 import * as fs from 'fs';
 import _ from 'lodash';
 import { applyPatch } from 'diff';
+import {
+  BASE64,
+  UTF8,
+  REF_DEVELOP,
+  REF_MASTER,
+  SI_DATA_FILE,
+  STATUS_ADDED,
+  STATUS_MODIFIED,
+  STATUS_REMOVED,
+} from '../../src/constants.js';
 
 const packageJsonUrl = new URL(
   '../../test/fixtures/package.json',
@@ -16,18 +26,6 @@ const svgsUrl = new URL('../../test/fixtures/svgs.json', import.meta.url);
 const packageJson = fs.readFileSync(packageJsonUrl);
 const simpleIconsData = fs.readFileSync(simpleIconsUrl);
 const svgs = JSON.parse(fs.readFileSync(svgsUrl));
-
-const BASE64 = 'base64';
-const UTF8 = 'utf-8';
-
-const SI_DATA_FILE = '_data/simple-icons.json';
-
-const STATUS_ADDED = 'added';
-const STATUS_MODIFIED = 'modified';
-const STATUS_REMOVED = 'removed';
-
-const REF_DEVELOP = 'develop';
-const REF_MASTER = 'master';
 
 const JSON_CONTENTS_URL =
   'https://api.github.com/repos/simple-icons/simple-icons/contents/_data%2Fsimple-icons.json';

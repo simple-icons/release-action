@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import * as fs from 'fs';
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep.js';
 import { applyPatch } from 'diff';
 import {
   BASE64,
@@ -714,36 +714,36 @@ const defaultClient = {
   },
 };
 
-const patchReleaseClient = _.cloneDeep(defaultClient);
+const patchReleaseClient = cloneDeep(defaultClient);
 patchReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[4]] };
 });
 
-const minorReleaseClient = _.cloneDeep(defaultClient);
+const minorReleaseClient = cloneDeep(defaultClient);
 minorReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[1]] };
 });
 
-const majorReleaseClient = _.cloneDeep(defaultClient);
+const majorReleaseClient = cloneDeep(defaultClient);
 majorReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return { data: [PRs[16]] };
 });
 
-const addAndUpdateReleaseClient = _.cloneDeep(defaultClient);
+const addAndUpdateReleaseClient = cloneDeep(defaultClient);
 addAndUpdateReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return {
     data: [PRs[1], PRs[2], PRs[14]],
   };
 });
 
-const addAndRemoveReleaseClient = _.cloneDeep(defaultClient);
+const addAndRemoveReleaseClient = cloneDeep(defaultClient);
 addAndRemoveReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
   return {
     data: [PRs[1], PRs[14], PRs[16]],
   };
 });
 
-const addRemoveAndUpdateReleaseClient = _.cloneDeep(defaultClient);
+const addRemoveAndUpdateReleaseClient = cloneDeep(defaultClient);
 addRemoveAndUpdateReleaseClient.rest.pulls.list = jest
   .fn()
   .mockImplementation(() => {

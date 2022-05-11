@@ -145,6 +145,24 @@ const PRs = [
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
+  {
+    // 17: PR that add one icon's guidelines
+    number: 516,
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
+  },
+  {
+    // 18: PR that add one icon's license
+    number: 517,
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
+  },
+  {
+    // 19: PR that add one icon's aliases
+    number: 518,
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'develop' },
+  },
 
   {
     // Previous release
@@ -488,6 +506,75 @@ const prFiles = {
        "hex": "FFCB05",
        "source": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"`,
       contents_url: `${JSON_CONTENTS_URL}?ref=515`,
+    },
+  ],
+  516: [
+    {
+      filename: '_data/simple-icons.json',
+      status: STATUS_MODIFIED,
+      patch: `@@ -3,7 +3,8 @@
+     {
+       "title": "1Password",
+       "hex": "363636",
+-      "source": "https://1password.com/press/"
++      "source": "https://1password.com/press/",
++      "guidelines": "https://test.com/guidelines"
+     },
+     {
+       "title": "500px",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=516`,
+    },
+  ],
+  517: [
+    {
+      filename: '_data/simple-icons.json',
+      status: STATUS_MODIFIED,
+      patch: `@@ -3,7 +3,11 @@
+     {
+       "title": "1Password",
+       "hex": "363636",
+-      "source": "https://1password.com/press/"
++      "source": "https://1password.com/press/",
++      "license": {
++        "type": "CC0-1.0",
++        "url": "https://www.a-fictional-brand.org/logo/license"
++      }
+     },
+     {
+       "title": "500px",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=517`,
+    },
+  ],
+  518: [
+    {
+      filename: '_data/simple-icons.json',
+      status: STATUS_MODIFIED,
+      patch: `@@ -3,7 +3,23 @@
+     {
+       "title": "1Password",
+       "hex": "363636",
+-      "source": "https://1password.com/press/"
++      "source": "https://1password.com/press/",
++      "aliases": {
++        "aka": [
++          "OneAkaName",
++          "OtherAkaName"
++        ],
++        "dup": [
++          {
++            "title": "the duplicate's title",
++            "hex": "654321",
++            "guidelines": "..."
++          }
++        ],
++        "loc": {
++          "en-US": "A different title"
++        }
++      }
+     },
+     {
+       "title": "500px",`,
+      contents_url: `${JSON_CONTENTS_URL}?ref=518`,
     },
   ],
 };

@@ -19,7 +19,7 @@ The new version will be: **v2.0.0**
 
 # Updated Icons
 
-- 1Password (#503, #509)
+- 1Password (#503, #509, #516, #517, #518)
 - AddThis (#508)
 - Adobe (#504)
 - Feedly (#502)

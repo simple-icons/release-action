@@ -1,5 +1,5 @@
 import alphaSort from 'alpha-sort';
-import { applyPatch } from 'diff';
+import diffPatchsApplier from 'diff/lib/patch/apply.js';
 import isEqual from 'lodash/isEqual.js';
 import semverInc from 'semver/functions/inc.js';
 
@@ -100,7 +100,7 @@ function restorePreviousContentUsingDiff(content, diff) {
     }
   }
 
-  return applyPatch(content, revertedDiffLines.join('\n'));
+  return diffPatchsApplier.applyPatch(content, revertedDiffLines.join('\n'));
 }
 
 function detectUpdatesInDataFile(siDataFile, previousSiDataFile) {

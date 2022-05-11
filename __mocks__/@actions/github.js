@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
-import * as fs from 'fs';
+import fs from 'node:fs';
 import cloneDeep from 'lodash/cloneDeep.js';
-import { applyPatch } from 'diff';
+import diffPatchsApplier from 'diff/lib/patch/apply.js';
 import {
   BASE64,
   UTF8,
@@ -703,7 +703,10 @@ const defaultClient = {
 
             return {
               data: {
-                content: encode(applyPatch(content, patch), BASE64),
+                content: encode(
+                  diffPatchsApplier.applyPatch(content, patch),
+                  BASE64,
+                ),
                 encoding: BASE64,
               },
             };

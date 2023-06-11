@@ -71,6 +71,10 @@ function isReleasePr(pr) {
   return pr.base.ref === BRANCH_MASTER;
 }
 
+function isSkipped(pr) {
+  return pr.title.startsWith('[skip]');
+}
+
 function isSimpleIconsDataFile(path) {
   return path === SI_DATA_FILE;
 }
@@ -204,6 +208,11 @@ async function getFilesSinceLastRelease(core, client, context) {
         continue;
       }
 
+      if (isSkipped(pr)) {
+        // If the PR marked as skipped the changes won't be included in this release
+        continue;
+      }
+
       if (IGNORE_PRS.includes(pr.number)) {
         // Ignore some PRs that we're not interested in
         continue;
@@ -235,7 +244,7 @@ async function getFilesSinceLastRelease(core, client, context) {
 }
 
 // Logic determining changes
-function getChangesFromFile(core, file, id) {
+async function getChangesFromFile(core, file, context, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
     core.info(`Detected an icon was added ('${file.path}')`);
 
@@ -280,7 +289,28 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    const sourceChanges = [...file.patch.matchAll(JSON_CHANGE_EXPR)];
+    core.debug(`\nSimple Icons data file`);
+    core.debug(file);
+
+    let filePatch = file.patch;
+
+    if (!filePatch) {
+      const contentResult = await client.rest.repos.getContent({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        path: file.filename,
+        ref: file.sha,
+      });
+
+      filePatch = Buffer.from(
+        contentResult.content,
+        contentResult.encoding,
+      ).toString();
+    }
+
+    const sourceChanges = [
+      ...(file.patch ? file.patch.matchAll(JSON_CHANGE_EXPR) : []),
+    ];
     for (let sourceChange of sourceChanges) {
       const name = sourceChange[1];
       changes.push({
@@ -495,7 +525,7 @@ async function getChanges(core, client, context) {
   for (let file of files) {
     i = i + 1;
 
-    const items = getChangesFromFile(core, file, i);
+    const items = await getChangesFromFile(core, file, context, i);
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);

@@ -244,7 +244,7 @@ async function getFilesSinceLastRelease(core, client, context) {
 }
 
 // Logic determining changes
-async function getChangesFromFile(core, file, context, id) {
+async function getChangesFromFile(core, file, client, context, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
     core.info(`Detected an icon was added ('${file.path}')`);
 
@@ -525,7 +525,7 @@ async function getChanges(core, client, context) {
   for (let file of files) {
     i = i + 1;
 
-    const items = await getChangesFromFile(core, file, context, i);
+    const items = await getChangesFromFile(core, file, client, context, i);
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);

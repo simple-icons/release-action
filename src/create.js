@@ -72,7 +72,7 @@ function isReleasePr(pr) {
 }
 
 function isSkipped(pr) {
-  return pr.title.startsWith('[skip]');
+  return pr.title.startsWith('[skip]') || pr.labels.map(label => label.name).includes('skip release note');
 }
 
 function isSimpleIconsDataFile(path) {

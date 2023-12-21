@@ -1,5 +1,5 @@
 import alphaSort from 'alpha-sort';
-import semverInc from 'semver/functions/inc';
+import semverInc from 'semver/functions/inc.js';
 
 const IGNORE_PRS = [6296, 6298];
 

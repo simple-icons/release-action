@@ -1,3 +1,4 @@
+import he from 'he';
 import alphaSort from 'alpha-sort';
 import semverInc from 'semver/functions/inc.js';
 
@@ -256,7 +257,7 @@ async function getChangesFromFile(core, file, client, context, id) {
       {
         id: id,
         changeType: CHANGE_TYPE_ADD,
-        name: svgTitleMatch[1],
+        name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
       },
@@ -270,7 +271,7 @@ async function getChangesFromFile(core, file, client, context, id) {
       {
         id: id,
         changeType: CHANGE_TYPE_UPDATE,
-        name: svgTitleMatch[1],
+        name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
       },
@@ -283,7 +284,7 @@ async function getChangesFromFile(core, file, client, context, id) {
       {
         id: id,
         changeType: CHANGE_TYPE_REMOVED,
-        name: svgTitleMatch[1],
+        name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
       },

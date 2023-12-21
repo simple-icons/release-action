@@ -312,7 +312,7 @@ async function getChangesFromFile(core, file, client, context, id) {
     }
 
     const sourceChanges = [
-      ...(file.patch ? file.patch.matchAll(JSON_CHANGE_EXPR) : []),
+      ...(filePatch ? filePatch.matchAll(JSON_CHANGE_EXPR) : []),
     ];
     for (let sourceChange of sourceChanges) {
       const name = sourceChange[1];

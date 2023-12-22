@@ -130,26 +130,30 @@ async function getPrFile(client, context, path, ref) {
   return _ghFileCache[path + ref];
 }
 
-async function* getPrFiles(core, client, context, prNumber) {
+async function getPrFiles(core, client, context, prNumber) {
   const { data: files } = await client.rest.pulls.listFiles({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: prNumber,
   });
 
+  const prFiles = [];
+
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
     try {
-      yield {
-        content: await getPrFile(
-          client,
-          context,
-          fileInfo.filename,
-          REF_DEVELOP,
-        ),
+      const content = await getPrFile(
+        client,
+        context,
+        fileInfo.filename,
+        REF_DEVELOP,
+      );
+
+      prFiles.push({
+        content,
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
-      };
+      });
     } catch (err) {
       core.warning(
         `${fileInfo.status} file not found on ${REF_DEVELOP} ('${fileInfo.filename}'): ${err}`,
@@ -159,17 +163,19 @@ async function* getPrFiles(core, client, context, prNumber) {
 
   for (let fileInfo of files.filter(iconFiles).filter(removedFiles)) {
     try {
-      yield {
-        content: await getPrFile(
-          client,
-          context,
-          fileInfo.filename,
-          REF_MASTER,
-        ),
+      const content = await getPrFile(
+        client,
+        context,
+        fileInfo.filename,
+        REF_MASTER,
+      );
+
+      prFiles.push({
+        content: content,
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
-      };
+      });
     } catch (err) {
       core.warning(
         `removed file not found on ${REF_MASTER} ('${fileInfo.filename}'): ${err}`,
@@ -179,13 +185,22 @@ async function* getPrFiles(core, client, context, prNumber) {
 
   const dataFile = files.find((file) => isSimpleIconsDataFile(file.filename));
   if (dataFile !== undefined) {
-    yield {
-      content: await getPrFile(client, context, dataFile.filename, REF_DEVELOP),
+    const content = await getPrFile(
+      client,
+      context,
+      dataFile.filename,
+      REF_DEVELOP,
+    );
+
+    prFiles.push({
+      content: content,
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
-    };
+    });
   }
+
+  return prFiles;
 }
 
 async function getFilesSinceLastRelease(core, client, context) {
@@ -201,7 +216,7 @@ async function getFilesSinceLastRelease(core, client, context) {
       sort: 'updated',
       direction: 'desc',
       per_page: perPage,
-      page: page,
+      page,
     });
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
@@ -230,7 +245,7 @@ async function getFilesSinceLastRelease(core, client, context) {
         );
       }
 
-      for await (let file of getPrFiles(core, client, context, pr.number)) {
+      for (let file of await getPrFiles(core, client, context, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
         file.merged_at = pr.merged_at;

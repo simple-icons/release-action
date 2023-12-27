@@ -8,5 +8,5 @@ inputs:
     required: true
 
 runs:
-  using: 'node12'
-  main: 'lib/index.cjs'
+  using: 'node20'
+  main: 'lib/index.mjs'

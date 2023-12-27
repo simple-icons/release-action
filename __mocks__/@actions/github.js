@@ -38,109 +38,133 @@ const PRs = [
   // https://developer.github.com/v3/pulls/#list-pull-requests
   {
     //  0: PR that was not merged
+    title: '500',
     number: 500,
     merged_at: null,
     base: { ref: 'develop' },
   },
   {
     //  1: PR that adds a file
+    title: '501',
     number: 501,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  2: PR that modifies an SVG
+    title: '502',
     number: 502,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  3: PR that was merged before the previous release
+    title: '498',
     number: 498,
     merged_at: '2011-01-01T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  4: PR that modifies one icon's color
+    title: '503',
     number: 503,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  5: PR that modifies one icon's source
+    title: '504',
     number: 504,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  6: PR that modifies one icon's color and source
+    title: '505',
     number: 505,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  7: PR that modifies an SVG and modifies that icon's color
+    title: '506',
     number: 506,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  8: PR that modifies an SVG and modifies that icon's source
+    title: '507',
     number: 507,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     //  9: PR that modifies an SVG and modifies that icon's color and source
+    title: '508',
     number: 508,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 10: PR that adds an SVG and modifies another icon's color and source
+    title: '509',
     number: 509,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 11: PR that adds an SVG and modifies another SVG
+    title: '510',
     number: 510,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 12: PR that changes the data file but no metadata
+    title: '511',
     number: 511,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 13: PR that adds a brand with a lowercased name
+    title: '512',
     number: 512,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 14: PR that adds ACM (which should be listed before the lowercased brand)
+    title: '513',
     number: 513,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 15: PR that adds a brand with an accented name
+    title: '514',
     number: 514,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
   {
     // 16: PR that removes an icon
+    title: '515',
     number: 515,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
   },
-
+  {
+    // Skipped release
+    title: '[skip] Skip this one',
+    number: 516,
+    merged_at: '2011-01-26T19:01:12Z',
+    base: { ref: 'master' },
+  },
   {
     // Previous release
+    title: 'Release',
     number: 499,
     merged_at: '2011-01-02T19:01:12Z',
     base: { ref: 'master' },

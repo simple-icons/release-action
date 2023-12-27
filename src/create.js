@@ -1,5 +1,6 @@
+import he from 'he';
 import alphaSort from 'alpha-sort';
-import semverInc from 'semver/functions/inc';
+import semverInc from 'semver/functions/inc.js';
 
 const IGNORE_PRS = [6296, 6298];
 
@@ -71,6 +72,13 @@ function isReleasePr(pr) {
   return pr.base.ref === BRANCH_MASTER;
 }
 
+function isSkipped(pr) {
+  return (
+    pr.title.startsWith('[skip]') ||
+    pr.labels?.map((label) => label.name).includes('skip release note')
+  );
+}
+
 function isSimpleIconsDataFile(path) {
   return path === SI_DATA_FILE;
 }
@@ -122,26 +130,30 @@ async function getPrFile(client, context, path, ref) {
   return _ghFileCache[path + ref];
 }
 
-async function* getPrFiles(core, client, context, prNumber) {
+async function getPrFiles(core, client, context, prNumber) {
   const { data: files } = await client.rest.pulls.listFiles({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: prNumber,
   });
 
+  const prFiles = [];
+
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
     try {
-      yield {
-        content: await getPrFile(
-          client,
-          context,
-          fileInfo.filename,
-          REF_DEVELOP,
-        ),
+      const content = await getPrFile(
+        client,
+        context,
+        fileInfo.filename,
+        REF_DEVELOP,
+      );
+
+      prFiles.push({
+        content,
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
-      };
+      });
     } catch (err) {
       core.warning(
         `${fileInfo.status} file not found on ${REF_DEVELOP} ('${fileInfo.filename}'): ${err}`,
@@ -151,17 +163,19 @@ async function* getPrFiles(core, client, context, prNumber) {
 
   for (let fileInfo of files.filter(iconFiles).filter(removedFiles)) {
     try {
-      yield {
-        content: await getPrFile(
-          client,
-          context,
-          fileInfo.filename,
-          REF_MASTER,
-        ),
+      const content = await getPrFile(
+        client,
+        context,
+        fileInfo.filename,
+        REF_MASTER,
+      );
+
+      prFiles.push({
+        content: content,
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
-      };
+      });
     } catch (err) {
       core.warning(
         `removed file not found on ${REF_MASTER} ('${fileInfo.filename}'): ${err}`,
@@ -171,13 +185,22 @@ async function* getPrFiles(core, client, context, prNumber) {
 
   const dataFile = files.find((file) => isSimpleIconsDataFile(file.filename));
   if (dataFile !== undefined) {
-    yield {
-      content: await getPrFile(client, context, dataFile.filename, REF_DEVELOP),
+    const content = await getPrFile(
+      client,
+      context,
+      dataFile.filename,
+      REF_DEVELOP,
+    );
+
+    prFiles.push({
+      content: content,
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
-    };
+    });
   }
+
+  return prFiles;
 }
 
 async function getFilesSinceLastRelease(core, client, context) {
@@ -193,7 +216,7 @@ async function getFilesSinceLastRelease(core, client, context) {
       sort: 'updated',
       direction: 'desc',
       per_page: perPage,
-      page: page,
+      page,
     });
 
     core.info(`on page ${page} there are ${prs.length} PRs`);
@@ -201,6 +224,11 @@ async function getFilesSinceLastRelease(core, client, context) {
       core.info(`processing PR #${pr.number}`);
       if (isMerged(pr) === false) {
         // If the PR is not merged the changes won't be included in this release
+        continue;
+      }
+
+      if (isSkipped(pr)) {
+        // If the PR marked as skipped the changes won't be included in this release
         continue;
       }
 
@@ -217,7 +245,7 @@ async function getFilesSinceLastRelease(core, client, context) {
         );
       }
 
-      for await (let file of getPrFiles(core, client, context, pr.number)) {
+      for (let file of await getPrFiles(core, client, context, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
         file.merged_at = pr.merged_at;
@@ -235,7 +263,7 @@ async function getFilesSinceLastRelease(core, client, context) {
 }
 
 // Logic determining changes
-function getChangesFromFile(core, file, id) {
+async function getChangesFromFile(core, file, client, context, id) {
   if (isIconFile(file.path) && file.status === STATUS_ADDED) {
     core.info(`Detected an icon was added ('${file.path}')`);
 
@@ -244,7 +272,7 @@ function getChangesFromFile(core, file, id) {
       {
         id: id,
         changeType: CHANGE_TYPE_ADD,
-        name: svgTitleMatch[1],
+        name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
       },
@@ -258,7 +286,7 @@ function getChangesFromFile(core, file, id) {
       {
         id: id,
         changeType: CHANGE_TYPE_UPDATE,
-        name: svgTitleMatch[1],
+        name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
       },
@@ -271,7 +299,7 @@ function getChangesFromFile(core, file, id) {
       {
         id: id,
         changeType: CHANGE_TYPE_REMOVED,
-        name: svgTitleMatch[1],
+        name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
       },
@@ -280,7 +308,28 @@ function getChangesFromFile(core, file, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
-    const sourceChanges = [...file.patch.matchAll(JSON_CHANGE_EXPR)];
+    core.debug(`\nSimple Icons data file`);
+    core.debug(file);
+
+    let filePatch = file.patch;
+
+    if (!filePatch) {
+      const contentResult = await client.rest.repos.getContent({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        path: file.filename,
+        ref: file.sha,
+      });
+
+      filePatch = Buffer.from(
+        contentResult.content,
+        contentResult.encoding,
+      ).toString();
+    }
+
+    const sourceChanges = [
+      ...(filePatch ? filePatch.matchAll(JSON_CHANGE_EXPR) : []),
+    ];
     for (let sourceChange of sourceChanges) {
       const name = sourceChange[1];
       changes.push({
@@ -495,7 +544,7 @@ async function getChanges(core, client, context) {
   for (let file of files) {
     i = i + 1;
 
-    const items = getChangesFromFile(core, file, i);
+    const items = await getChangesFromFile(core, file, client, context, i);
     for (let item of items) {
       if (item.changeType === CHANGE_TYPE_ADD) {
         newIcons.push(item);

@@ -7,6 +7,7 @@ async function main(core, github, { makeRelease, mergeOnApprove }) {
 
   const event = github.context.eventName;
   switch (event) {
+    case 'workflow_dispatch':
     case 'pull_request': // for testing
     case EVENT_SCHEDULE:
       core.info('Scheduled run; creating release PR');

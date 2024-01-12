@@ -19,7 +19,7 @@ Please note that modifications should follow these coding guidelines:
 
 ## Building
 
-We use [@zeit/ncc](https://github.com/vercel/ncc#readme) to create a single `.js` file that contains all the source code needed to run the Action. This means that this file works without the `node_modules/` folder present.
+We use [@vercel/ncc](https://github.com/vercel/ncc#readme) to create a single `.js` file that contains all the source code needed to run the Action. This means that this file works without the `node_modules/` folder present.
 
 Therefore, you should make sure the `npm run build` command does not fail due to your changes. Run `npm run build` before making a commit and include the changes in the `./lib` folder in your commit.
 

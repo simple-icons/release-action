@@ -4,7 +4,7 @@ const EVENT_PULL_REQUEST_REVIEW = 'pull_request_review';
 const EVENT_SCHEDULE = 'schedule';
 const EVENT_DEBUG = 'debug';
 
-const isDebug = Boolean(env.SI_REPOSITORY_TOKEN);
+const isDebug = Boolean(env.SI_REPOSITORY_TOKEN) && env.NODE_ENV !== 'test';
 
 async function main(
   core,
@@ -13,7 +13,7 @@ async function main(
 ) {
   const token =
     env.SI_REPOSITORY_TOKEN || core.getInput('repo-token', { required: true });
-  const client = new github.getOctokit(token);
+  const client = github.getOctokit(token);
 
   const event = isDebug ? EVENT_DEBUG : github.context.eventName;
   switch (event) {

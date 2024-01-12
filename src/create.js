@@ -131,12 +131,13 @@ async function getPrFile(client, context, path, ref) {
 }
 
 async function getPrFiles(core, client, context, prNumber) {
-  const { data: files } = await client.rest.pulls.listFiles({
+  const result = await client.rest.pulls.listFiles({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: prNumber,
   });
 
+  const files = result.data;
   const prFiles = [];
 
   for (let fileInfo of files.filter(iconFiles).filter(existingFiles)) {
@@ -587,11 +588,15 @@ export async function makeReleaseNotes(core, client, context) {
     updatedIcons,
     removedIcons,
   );
-  return { title, notes };
+  return { title, notes, newVersion };
 }
 
 export async function makeRelease(core, client, context) {
-  const { title, notes } = makeReleaseNotes(core, client, context);
+  const { title, notes, newVersion } = await makeReleaseNotes(
+    core,
+    client,
+    context,
+  );
   await createReleasePr(core, client, context, title, notes);
   core.setOutput(OUTPUT_NEW_VERSION_NAME, newVersion);
 }

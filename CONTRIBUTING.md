@@ -10,11 +10,6 @@ Simple Icons welcomes contributions and corrections. Before contributing, please
 
 Also consider the following, this Action is tailor-made for [Simple Icons](https://github.com/simple-icons/simple-icons) and changes should always be made with that in mind. If you wish to implement significant changes you are perhaps better off forking this repository.
 
-## Table of contents
-
-* [Guidelines](#guidelines)
-* [Building](#building)
-
 ## Guidelines
 
 Please note that modifications should follow these coding guidelines:
@@ -24,6 +19,14 @@ Please note that modifications should follow these coding guidelines:
 
 ## Building
 
-We use [@zeit/ncc](https://github.com/zeit/ncc#readme) to create a single `.js` file that contains all the source code needed to run the Action. This means that this file works without the `node_modules/` folder present.
+We use [@zeit/ncc](https://github.com/vercel/ncc#readme) to create a single `.js` file that contains all the source code needed to run the Action. This means that this file works without the `node_modules/` folder present.
 
 Therefore, you should make sure the `npm run build` command does not fail due to your changes. Run `npm run build` before making a commit and include the changes in the `./lib` folder in your commit.
+
+## Local Preview
+
+Use this command below to preview the release note:
+
+```shell
+SI_SI_REPOSITORY_TOKEN='your-repo-token' npm run preview
+```

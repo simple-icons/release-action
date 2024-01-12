@@ -171,7 +171,7 @@ async function getPrFiles(core, client, context, prNumber) {
       );
 
       prFiles.push({
-        content: content,
+        content,
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
@@ -193,7 +193,7 @@ async function getPrFiles(core, client, context, prNumber) {
     );
 
     prFiles.push({
-      content: content,
+      content,
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
@@ -308,10 +308,9 @@ async function getChangesFromFile(core, file, client, context, id) {
     core.info(`Detected a change to the data file`);
     const changes = [];
 
+    let filePatch = file.patch;
     core.debug(`\nSimple Icons data file`);
     core.debug(file);
-
-    let filePatch = file.patch;
 
     if (!filePatch) {
       const contentResult = await client.rest.repos.getContent({
@@ -559,7 +558,7 @@ async function getChanges(core, client, context) {
   return filterDuplicates(newIcons, updatedIcons, removedIcons);
 }
 
-async function makeRelease(core, client, context) {
+export async function makeReleaseNotes(core, client, context) {
   const [newIcons, updatedIcons, removedIcons] = await getChanges(
     core,
     client,
@@ -572,7 +571,7 @@ async function makeRelease(core, client, context) {
   ) {
     core.info('No notable changes detected');
     core.setOutput(OUTPUT_DID_CREATE_PR_NAME, 'false');
-    return;
+    return {};
   }
   core.setOutput(OUTPUT_DID_CREATE_PR_NAME, 'true');
 
@@ -581,16 +580,18 @@ async function makeRelease(core, client, context) {
     modified: updatedIcons,
     removed: removedIcons,
   });
-  const releaseTitle = createReleaseTitle(newIcons, updatedIcons, removedIcons);
-  const releaseNotes = createReleaseNotes(
+  const title = createReleaseTitle(newIcons, updatedIcons, removedIcons);
+  const notes = createReleaseNotes(
     newVersion,
     newIcons,
     updatedIcons,
     removedIcons,
   );
-
-  await createReleasePr(core, client, context, releaseTitle, releaseNotes);
-  core.setOutput(OUTPUT_NEW_VERSION_NAME, newVersion);
+  return { title, notes };
 }
 
-export default makeRelease;
+export async function makeRelease(core, client, context) {
+  const { title, notes } = makeReleaseNotes(core, client, context);
+  await createReleasePr(core, client, context, title, notes);
+  core.setOutput(OUTPUT_NEW_VERSION_NAME, newVersion);
+}

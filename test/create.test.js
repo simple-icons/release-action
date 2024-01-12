@@ -49,7 +49,7 @@ test.each([
   ['patch', '1.0.1'],
   ['minor', '1.1.0'],
   ['major', '2.0.0'],
-])('correct new version (%s %s)', async (token, expectedVersion) => {
+])('correct new version (%s)', async (token, expectedVersion) => {
   expect.assertions(2);
 
   const _client = github.getOctokit(token);

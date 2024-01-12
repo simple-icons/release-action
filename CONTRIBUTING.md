@@ -28,5 +28,5 @@ Therefore, you should make sure the `npm run build` command does not fail due to
 Use this command below to preview the release note:
 
 ```shell
-SI_SI_REPOSITORY_TOKEN='your-repo-token' npm run preview
+SI_REPOSITORY_TOKEN='your-repo-token' npm run preview
 ```

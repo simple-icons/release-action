@@ -575,20 +575,13 @@ const files = {
 const defaultClient = {
   rest: {
     issues: {
-      addLabels: jest
-        .fn()
-        .mockName('github.issues.addLabels')
-        .mockImplementation(() => {
-          return;
-        }),
+      addLabels: jest.fn(() => {}).mockName('github.issues.addLabels'),
     },
     pulls: {
       create: jest
         .fn()
         .mockName('github.pulls.create')
-        .mockImplementation(() => {
-          return { data: { number: 42 } };
-        }),
+        .mockImplementation(() => ({ data: { number: 42 } })),
       list: jest
         .fn()
         .mockName('github.pulls.list')
@@ -619,42 +612,40 @@ const defaultClient = {
 };
 
 const patchReleaseClient = _.cloneDeep(defaultClient);
-patchReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
-  return { data: [PRs[4]] };
-});
+patchReleaseClient.rest.pulls.list = jest
+  .fn()
+  .mockImplementation(() => ({ data: [PRs[4]] }));
 
 const minorReleaseClient = _.cloneDeep(defaultClient);
-minorReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
-  return { data: [PRs[1]] };
-});
+minorReleaseClient.rest.pulls.list = jest
+  .fn()
+  .mockImplementation(() => ({ data: [PRs[1]] }));
 
 const majorReleaseClient = _.cloneDeep(defaultClient);
-majorReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
-  return { data: [PRs[16]] };
-});
+majorReleaseClient.rest.pulls.list = jest
+  .fn()
+  .mockImplementation(() => ({ data: [PRs[16]] }));
 
 const addAndUpdateReleaseClient = _.cloneDeep(defaultClient);
-addAndUpdateReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
-  return {
+addAndUpdateReleaseClient.rest.pulls.list = jest
+  .fn()
+  .mockImplementation(() => ({
     data: [PRs[1], PRs[2], PRs[14]],
-  };
-});
+  }));
 
 const addAndRemoveReleaseClient = _.cloneDeep(defaultClient);
-addAndRemoveReleaseClient.rest.pulls.list = jest.fn().mockImplementation(() => {
-  return {
+addAndRemoveReleaseClient.rest.pulls.list = jest
+  .fn()
+  .mockImplementation(() => ({
     data: [PRs[1], PRs[14], PRs[16]],
-  };
-});
+  }));
 
 const addRemoveAndUpdateReleaseClient = _.cloneDeep(defaultClient);
 addRemoveAndUpdateReleaseClient.rest.pulls.list = jest
   .fn()
-  .mockImplementation(() => {
-    return {
-      data: [PRs[1], PRs[2], PRs[14], PRs[16]],
-    };
-  });
+  .mockImplementation(() => ({
+    data: [PRs[1], PRs[2], PRs[14], PRs[16]],
+  }));
 
 export const context = {
   eventName: 'schedule',

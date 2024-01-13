@@ -1,7 +1,7 @@
 import * as core from '../__mocks__/@actions/core.js';
 import * as github from '../__mocks__/@actions/github.js';
 
-import makeRelease from '../src/create.js';
+import { makeRelease } from '../src/create.js';
 
 const client = new github.getOctokit('token');
 const expectedNotes = `_this Pull Request was automatically generated_

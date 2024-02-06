@@ -16,7 +16,7 @@
     "postbuild": "mv lib/index.js lib/index.mjs",
     "format": "prettier --write .",
     "lint": "prettier --check .",
-    "postinstall": "is-ci || husky install",
+    "postinstall": "is-ci || husky",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {

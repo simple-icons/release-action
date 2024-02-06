@@ -1,9 +1,6 @@
-#!/bin/sh
-. "$(dirname $0)/_/husky.sh"
-
 # Format the code base
 npm run format
-git add .
+git add -u
 
 # Compile into lib/
 npm run build

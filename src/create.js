@@ -84,7 +84,11 @@ function isSimpleIconsDataFile(path) {
 }
 
 function prNumbersToString(prNumbers) {
-  return prNumbers.map((prNumber) => `#${prNumber}`).join(' ');
+  return prNumbers.map((prNumber) => `#${prNumber}`).join(', ');
+}
+
+function authorsToString(authors) {
+  return authors.map((author) => `@${author}`).join(', ');
 }
 
 // GitHub API
@@ -277,7 +281,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        author: file.author,
+        authors: [file.author],
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_MODIFIED) {
@@ -292,7 +296,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        author: file.author,
+        authors: [file.author],
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_REMOVED) {
@@ -306,7 +310,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        author: file.author,
+        authors: [file.author],
       },
     ];
   } else if (isSimpleIconsDataFile(file.path)) {
@@ -338,7 +342,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         changeType: CHANGE_TYPE_UPDATE,
         name: name,
         prNumbers: [file.prNumber],
-        author: file.author,
+        authors: [file.author],
       });
     }
 
@@ -360,6 +364,7 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     for (let updatedIcon of updatedIcons) {
       if (updatedIcon.name === newIcon.name) {
         newIcon.prNumbers.push(...updatedIcon.prNumbers);
+        newIcons.authors.push(...updatedIcon.authors);
         removeFromUpdated.push(updatedIcon);
       }
     }
@@ -413,7 +418,11 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
         const otherPrNumbers = otherIcon.prNumbers.filter(
           (prNumber) => !updatedIcon.prNumbers.includes(prNumber),
         );
+        const otherAuthors = otherIcon.authors.filter(
+          (author) => !updatedIcon.authors.includes(author),
+        );
         updatedIcon.prNumbers.push(...otherPrNumbers);
+        updatedIcon.authors.push(...otherAuthors);
         removeFromUpdated.push(otherIcon);
       }
     }
@@ -491,7 +500,8 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# New Icons\n\n';
     for (let newIcon of newIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(newIcon.prNumbers);
-      releaseNotes += `- ${newIcon.name} (${prs}) (@${newIcon.author})\n`;
+      const authors = authorsToString(newIcon.authors);
+      releaseNotes += `- ${newIcon.name} (${prs}) (${authors})\n`;
     }
   }
 
@@ -499,7 +509,8 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# Updated Icons\n\n';
     for (let updatedIcon of updatedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
-      releaseNotes += `- ${updatedIcon.name} (${prs}) (@${updatedIcon.author})\n`;
+      const authors = authorsToString(updatedIcon.authors);
+      releaseNotes += `- ${updatedIcon.name} (${prs}) (${authors})\n`;
     }
   }
 
@@ -507,7 +518,8 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# Removed Icons\n\n';
     for (let removedIcon of removedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(removedIcon.prNumbers);
-      releaseNotes += `- ${removedIcon.name} (${prs}) (@${removedIcon.author})\n`;
+      const authors = authorsToString(removedIcon.authors);
+      releaseNotes += `- ${removedIcon.name} (${prs}) (${authors})\n`;
     }
   }
 

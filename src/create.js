@@ -491,7 +491,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# New Icons\n\n';
     for (let newIcon of newIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(newIcon.prNumbers);
-      releaseNotes += `- ${prs} ${newIcon.name} (@${newIcon.author})\n`;
+      releaseNotes += `- ${newIcon.name} (${prs}) (@${newIcon.author})\n`;
     }
   }
 
@@ -499,7 +499,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# Updated Icons\n\n';
     for (let updatedIcon of updatedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
-      releaseNotes += `- ${prs} ${updatedIcon.name} (@${updatedIcon.author})\n`;
+      releaseNotes += `- ${updatedIcon.name} (${prs}) (@${updatedIcon.author})\n`;
     }
   }
 
@@ -507,7 +507,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# Removed Icons\n\n';
     for (let removedIcon of removedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(removedIcon.prNumbers);
-      releaseNotes += `- ${prs} ${removedIcon.name} (@${removedIcon.author})\n`;
+      releaseNotes += `- ${removedIcon.name} (${prs}) (@${removedIcon.author})\n`;
     }
   }
 

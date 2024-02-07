@@ -84,7 +84,7 @@ function isSimpleIconsDataFile(path) {
 }
 
 function prNumbersToString(prNumbers) {
-  return prNumbers.map((prNumber) => `#${prNumber}`).join(', ');
+  return prNumbers.map((prNumber) => `#${prNumber}`).join(' ');
 }
 
 // GitHub API
@@ -249,6 +249,7 @@ async function getFilesSinceLastRelease(core, client, context) {
       for (let file of await getPrFiles(core, client, context, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
+        file.author = pr.user.login;
         file.merged_at = pr.merged_at;
         files.push(file);
       }
@@ -276,6 +277,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
+        author: file.author,
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_MODIFIED) {
@@ -290,6 +292,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
+        author: file.author,
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_REMOVED) {
@@ -303,6 +306,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
+        author: file.author,
       },
     ];
   } else if (isSimpleIconsDataFile(file.path)) {
@@ -310,9 +314,6 @@ async function getChangesFromFile(core, file, client, context, id) {
     const changes = [];
 
     let filePatch = file.patch;
-    core.debug(`\nSimple Icons data file`);
-    core.debug(file);
-
     if (!filePatch) {
       const contentResult = await client.rest.repos.getContent({
         owner: context.repo.owner,
@@ -337,6 +338,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         changeType: CHANGE_TYPE_UPDATE,
         name: name,
         prNumbers: [file.prNumber],
+        author: file.author,
       });
     }
 
@@ -489,7 +491,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# New Icons\n\n';
     for (let newIcon of newIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(newIcon.prNumbers);
-      releaseNotes += `- ${newIcon.name} (${prs})\n`;
+      releaseNotes += `- ${prs} ${newIcon.name} (@${newIcon.author})\n`;
     }
   }
 
@@ -497,7 +499,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# Updated Icons\n\n';
     for (let updatedIcon of updatedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
-      releaseNotes += `- ${updatedIcon.name} (${prs})\n`;
+      releaseNotes += `- ${prs} ${updatedIcon.name} (@${updatedIcon.author})\n`;
     }
   }
 
@@ -505,7 +507,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     releaseNotes += '\n# Removed Icons\n\n';
     for (let removedIcon of removedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(removedIcon.prNumbers);
-      releaseNotes += `- ${removedIcon.name} (${prs})\n`;
+      releaseNotes += `- ${prs} ${removedIcon.name} (@${removedIcon.author})\n`;
     }
   }
 

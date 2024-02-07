@@ -10,28 +10,28 @@ The new version will be: **v2.0.0**
 
 # New Icons
 
-- ACM (#513)
-- bar (#512)
-- Foo (#501)
-- Jest (#509)
-- Pokémon (#514)
-- WordPress (#510)
+- #513 ACM (@LitoMore)
+- #512 bar (@LitoMore)
+- #501 Foo (@LitoMore)
+- #509 Jest (@LitoMore)
+- #514 Pokémon (@LitoMore)
+- #510 WordPress (@LitoMore)
 
 # Updated Icons
 
-- 1Password (#503)
-- Abstract (#509)
-- AddThis (#508)
-- Adobe (#504)
-- Feedly (#502)
-- Intel (#507)
-- Mozilla (#505)
-- Opera (#510)
-- Postman (#506)
+- #503 1Password (@LitoMore)
+- #509 Abstract (@LitoMore)
+- #508 AddThis (@LitoMore)
+- #504 Adobe (@LitoMore)
+- #502 Feedly (@LitoMore)
+- #507 Intel (@LitoMore)
+- #505 Mozilla (@LitoMore)
+- #510 Opera (@LitoMore)
+- #506 Postman (@LitoMore)
 
 # Removed Icons
 
-- Foobar (#515)
+- #515 Foobar (@LitoMore)
 `;
 
 beforeEach(() => {

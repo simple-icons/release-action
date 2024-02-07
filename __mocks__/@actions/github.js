@@ -42,6 +42,7 @@ const PRs = [
     number: 500,
     merged_at: null,
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  1: PR that adds a file
@@ -49,6 +50,7 @@ const PRs = [
     number: 501,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  2: PR that modifies an SVG
@@ -56,6 +58,7 @@ const PRs = [
     number: 502,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  3: PR that was merged before the previous release
@@ -63,6 +66,7 @@ const PRs = [
     number: 498,
     merged_at: '2011-01-01T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  4: PR that modifies one icon's color
@@ -70,6 +74,7 @@ const PRs = [
     number: 503,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  5: PR that modifies one icon's source
@@ -77,6 +82,7 @@ const PRs = [
     number: 504,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  6: PR that modifies one icon's color and source
@@ -84,6 +90,7 @@ const PRs = [
     number: 505,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  7: PR that modifies an SVG and modifies that icon's color
@@ -91,6 +98,7 @@ const PRs = [
     number: 506,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  8: PR that modifies an SVG and modifies that icon's source
@@ -98,6 +106,7 @@ const PRs = [
     number: 507,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     //  9: PR that modifies an SVG and modifies that icon's color and source
@@ -105,6 +114,7 @@ const PRs = [
     number: 508,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 10: PR that adds an SVG and modifies another icon's color and source
@@ -112,6 +122,7 @@ const PRs = [
     number: 509,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 11: PR that adds an SVG and modifies another SVG
@@ -119,6 +130,7 @@ const PRs = [
     number: 510,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 12: PR that changes the data file but no metadata
@@ -126,6 +138,7 @@ const PRs = [
     number: 511,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 13: PR that adds a brand with a lowercased name
@@ -133,6 +146,7 @@ const PRs = [
     number: 512,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 14: PR that adds ACM (which should be listed before the lowercased brand)
@@ -140,6 +154,7 @@ const PRs = [
     number: 513,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 15: PR that adds a brand with an accented name
@@ -147,6 +162,7 @@ const PRs = [
     number: 514,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // 16: PR that removes an icon
@@ -154,6 +170,7 @@ const PRs = [
     number: 515,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
+    user: { login: 'LitoMore' },
   },
   {
     // Skipped release
@@ -161,6 +178,7 @@ const PRs = [
     number: 516,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'master' },
+    user: { login: 'LitoMore' },
   },
   {
     // Previous release
@@ -168,6 +186,7 @@ const PRs = [
     number: 499,
     merged_at: '2011-01-02T19:01:12Z',
     base: { ref: 'master' },
+    user: { login: 'LitoMore' },
   },
 ];
 

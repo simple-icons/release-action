@@ -10,12 +10,12 @@ The new version will be: **v2.0.0**
 
 # New Icons
 
-- ACM (#513) (@LitoMore)
+- ACM (#513) (@mondeja)
 - bar (#512) (@LitoMore)
 - Foo (#501) (@LitoMore)
-- Jest (#509) (@LitoMore)
-- Pokémon (#514) (@LitoMore)
-- WordPress (#510) (@LitoMore)
+- Jest (#509) (@service-paradis)
+- Pokémon (#514) (@PeterShaggyNoble)
+- WordPress (#510) (@fbernhart)
 
 # Updated Icons
 

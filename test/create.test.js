@@ -10,28 +10,28 @@ The new version will be: **v2.0.0**
 
 # New Icons
 
-- ACM (#513)
-- bar (#512)
-- Foo (#501)
-- Jest (#509)
-- Pokémon (#514)
-- WordPress (#510)
+- ACM (#513) (@mondeja)
+- bar (#512) (@LitoMore)
+- Foo (#501) (@LitoMore)
+- Jest (#509) (@service-paradis)
+- Pokémon (#514) (@PeterShaggyNoble)
+- WordPress (#510) (@fbernhart)
 
 # Updated Icons
 
-- 1Password (#503)
-- Abstract (#509)
-- AddThis (#508)
-- Adobe (#504)
-- Feedly (#502)
-- Intel (#507)
-- Mozilla (#505)
-- Opera (#510)
-- Postman (#506)
+- 1Password (#503) (@service-paradis)
+- Abstract (#509) (@service-paradis)
+- AddThis (#508) (@PeterShaggyNoble)
+- Adobe (#504) (@fbernhart)
+- Feedly (#502) (@mondeja)
+- Intel (#507) (@mondeja)
+- Mozilla (#505) (@adamrusted)
+- Opera (#510) (@fbernhart)
+- Postman (#506) (@LitoMore)
 
 # Removed Icons
 
-- Foobar (#515)
+- Foobar (#515) (@service-paradis)
 `;
 
 beforeEach(() => {

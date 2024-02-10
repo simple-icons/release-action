@@ -19,14 +19,14 @@ The new version will be: **v2.0.0**
 
 # Updated Icons
 
-- 1Password (#503) (@LitoMore)
-- Abstract (#509) (@LitoMore)
-- AddThis (#508) (@LitoMore)
-- Adobe (#504) (@LitoMore)
-- Feedly (#502) (@LitoMore)
-- Intel (#507) (@LitoMore)
-- Mozilla (#505) (@LitoMore)
-- Opera (#510) (@LitoMore)
+- 1Password (#503) (@service-paradis)
+- Abstract (#509) (@service-paradis)
+- AddThis (#508) (@PeterShaggyNoble)
+- Adobe (#504) (@fbernhart)
+- Feedly (#502) (@mondeja)
+- Intel (#507) (@mondeja)
+- Mozilla (#505) (@adamrusted)
+- Opera (#510) (@fbernhart)
 - Postman (#506) (@LitoMore)
 
 # Removed Icons

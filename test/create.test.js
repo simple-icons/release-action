@@ -31,7 +31,7 @@ The new version will be: **v2.0.0**
 
 # Removed Icons
 
-- Foobar (#515) (@LitoMore)
+- Foobar (#515) (@service-paradis)
 `;
 
 beforeEach(() => {

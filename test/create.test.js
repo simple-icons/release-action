@@ -8,7 +8,7 @@ const expectedNotes = `_this Pull Request was automatically generated_
 
 The new version will be: **v2.0.0**
 
-# New Icons
+## 6 new icons
 
 - ACM (#513) (@mondeja)
 - bar (#512) (@LitoMore)
@@ -17,7 +17,7 @@ The new version will be: **v2.0.0**
 - Pokémon (#514) (@PeterShaggyNoble)
 - WordPress (#510) (@fbernhart)
 
-# Updated Icons
+## 9 updated icons
 
 - 1Password (#503) (@service-paradis)
 - Abstract (#509) (@service-paradis)
@@ -29,7 +29,7 @@ The new version will be: **v2.0.0**
 - Opera (#510) (@fbernhart)
 - Postman (#506) (@LitoMore)
 
-# Removed Icons
+## 1 removed icon
 
 - Foobar (#515) (@service-paradis)
 `;

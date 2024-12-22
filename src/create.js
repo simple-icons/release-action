@@ -158,6 +158,7 @@ async function getPrFiles(core, client, context, prNumber) {
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
+        contentsUrl: fileInfo.contents_url,
       });
     } catch (err) {
       core.warning(
@@ -180,6 +181,7 @@ async function getPrFiles(core, client, context, prNumber) {
         patch: fileInfo.patch,
         path: fileInfo.filename,
         status: fileInfo.status,
+        contentsUrl: fileInfo.contents_url,
       });
     } catch (err) {
       core.warning(
@@ -202,6 +204,7 @@ async function getPrFiles(core, client, context, prNumber) {
       patch: dataFile.patch,
       path: dataFile.filename,
       status: dataFile.status,
+      contentsUrl: dataFile.contents_url,
     });
   }
 
@@ -322,13 +325,16 @@ async function getChangesFromFile(core, file, client, context, id) {
       const contentResult = await client.rest.repos.getContent({
         owner: context.repo.owner,
         repo: context.repo.repo,
-        path: file.filename,
-        ref: file.sha,
+        path: file.path,
+        ref: new URL(file.contentsUrl).searchParams.get('ref'),
       });
 
       filePatch = Buffer.from(
-        contentResult.content,
-        contentResult.encoding,
+        // The content is base64 encoded but splited with newlines, so we need to remove them before decoding
+        contentResult.data.encoding === 'base64'
+          ? contentResult.data.content.replaceAll('\n', '')
+          : contentResult.data.content,
+        contentResult.data.encoding,
       ).toString();
     }
 

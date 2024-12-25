@@ -30,3 +30,11 @@ Use this command below to preview the release note:
 ```shell
 SI_REPOSITORY_TOKEN='your-repo-token' npm run preview
 ```
+
+## Release
+
+1. Update the `version` field in `package.json`
+2. Run `npm install` to apply all `package.json` changes to `package-lock.json`
+3. Create a commit to `master` branch with the `Release v{major}.{minor}.{patch}` commit message, and push the commit
+4. Create a release on the latest commit, the release tag should be `v{major}.{minor}.{patch}`
+5. Switch to the `v{major}` branch, rebase the `master` branch to `v{major}` branch, and push to the remote

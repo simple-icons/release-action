@@ -533,7 +533,7 @@ const files = {
     content: encode(packageJson, BASE64),
     encoding: BASE64,
   },
-  '_data/simple-icons.json': {
+  'data/simple-icons.json': {
     content: encode(simpleIconsData, BASE64),
     encoding: BASE64,
   },

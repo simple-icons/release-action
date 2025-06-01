@@ -19,7 +19,7 @@ const svgs = JSON.parse(fs.readFileSync(svgsUrl));
 const BASE64 = 'base64';
 const UTF8 = 'utf-8';
 
-const SI_DATA_FILE = '_data/simple-icons.json';
+const SI_DATA_FILE = 'data/simple-icons.json';
 
 const STATUS_ADDED = 'added';
 const STATUS_MODIFIED = 'modified';

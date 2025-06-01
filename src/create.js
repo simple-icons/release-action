@@ -7,7 +7,7 @@ const IGNORE_PRS = [6296, 6298];
 const BASE64 = 'base64';
 const UTF8 = 'utf-8';
 
-const SI_DATA_FILE = '_data/simple-icons.json';
+const SI_DATA_FILE = 'data/simple-icons.json';
 const PACKAGE_FILE = 'package.json';
 
 const STATUS_ADDED = 'added';
@@ -370,7 +370,9 @@ function filterDuplicates(newIcons, updatedIcons, removedIcons) {
     for (let updatedIcon of updatedIcons) {
       if (updatedIcon.name === newIcon.name) {
         newIcon.prNumbers.push(...updatedIcon.prNumbers);
-        newIcons.authors.push(...updatedIcon.authors);
+        if (Array.isArray(newIcons.authors)) {
+          newIcons.authors.push(...updatedIcon.authors);
+        }
         removeFromUpdated.push(updatedIcon);
       }
     }

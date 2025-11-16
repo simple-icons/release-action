@@ -12,7 +12,7 @@
   },
   "scripts": {
     "preview": "GITHUB_REPOSITORY=simple-icons/simple-icons node src/index.js",
-    "build": "del-cli lib && ncc build src/index.js -m -o lib && node scripts/fix-distribution-file.js",
+    "build": "del-cli lib && ncc build src/index.js -o lib && node scripts/fix-distribution-file.js",
     "postbuild": "mv lib/index.js lib/index.mjs",
     "format": "prettier --write .",
     "lint": "prettier --check .",

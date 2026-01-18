@@ -622,19 +622,11 @@ const defaultClient = {
         .mockImplementation((args) => {
           const prNumber = args.pull_number;
           const user = PRs.find((pr) => pr.number === prNumber).user.login;
-          if (typeof user == 'Array') {
-            return {
-              data: user.map((u) => ({
-                commit: { author: { name: u } },
-              })),
-            };
-          }
+          const users = Array.isArray(user) ? user : [user];
           return {
-            data: [
-              {
-                commit: { author: { name: user } },
-              },
-            ],
+            data: users.map((u) => ({
+              commit: { author: { name: u } },
+            })),
           };
         }),
       merge: jest.fn().mockName('github.pulls.merge'),

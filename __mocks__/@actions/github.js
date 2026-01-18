@@ -106,7 +106,7 @@ const PRs = [
     number: 507,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
-    user: { login: 'mondeja' },
+    user: { login: ['mondeja', 'LitoMore'] },
   },
   {
     //  9: PR that modifies an SVG and modifies that icon's color and source
@@ -615,6 +615,27 @@ const defaultClient = {
         .mockImplementation((args) => {
           const prNumber = args.pull_number;
           return { data: prFiles[prNumber] };
+        }),
+      listCommits: jest
+        .fn()
+        .mockName('github.pulls.listCommits')
+        .mockImplementation((args) => {
+          const prNumber = args.pull_number;
+          const user = PRs.find((pr) => pr.number === prNumber).user.login;
+          if (typeof user == 'Array') {
+            return {
+              data: user.map((u) => ({
+                commit: { author: { name: u } },
+              })),
+            };
+          }
+          return {
+            data: [
+              {
+                commit: { author: { name: user } },
+              },
+            ],
+          };
         }),
       merge: jest.fn().mockName('github.pulls.merge'),
     },

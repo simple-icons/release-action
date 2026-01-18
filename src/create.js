@@ -88,7 +88,8 @@ function prNumbersToString(prNumbers) {
 }
 
 function authorsToString(authors) {
-  return authors.map((author) => `@${author}`).join(', ');
+  const flatAuthors = [...new Set(authors.flat())];
+  return flatAuthors.map((author) => `@${author}`).join(', ');
 }
 
 // GitHub API
@@ -253,10 +254,17 @@ async function getFilesSinceLastRelease(core, client, context) {
         );
       }
 
+      const authors = await getPrAuthors(client, context, pr.number);
+      core.info(
+        `PR #${pr.number} was merged at ${pr.merged_at} by authors: ${authors.join(
+          ', ',
+        )}`,
+      );
+
       for (let file of await getPrFiles(core, client, context, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
-        file.author = pr.user.login;
+        file.authors = authors;
         file.merged_at = pr.merged_at;
         files.push(file);
       }
@@ -269,6 +277,34 @@ async function getFilesSinceLastRelease(core, client, context) {
 
     page += 1;
   }
+}
+
+async function getPrAuthors(client, context, prNumber) {
+  const authors = new Set();
+
+  let page = 1;
+  while (true) {
+    const { data: commits } = await client.rest.pulls.listCommits({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: prNumber,
+      per_page: 100,
+      page,
+    });
+
+    for (const commit of commits) {
+      if (commit.author?.login) {
+        authors.add(commit.author.login);
+      } else if (commit.commit?.author?.name) {
+        authors.add(commit.commit.author.name);
+      }
+    }
+
+    if (commits.length < 100) break;
+    page++;
+  }
+
+  return [...authors];
 }
 
 // Logic determining changes
@@ -284,7 +320,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_MODIFIED) {
@@ -299,7 +335,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_REMOVED) {
@@ -313,7 +349,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       },
     ];
   } else if (isSimpleIconsDataFile(file.path)) {
@@ -348,7 +384,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         changeType: CHANGE_TYPE_UPDATE,
         name: name,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       });
     }
 

@@ -616,19 +616,6 @@ const defaultClient = {
           const prNumber = args.pull_number;
           return { data: prFiles[prNumber] };
         }),
-      listCommits: jest
-        .fn()
-        .mockName('github.pulls.listCommits')
-        .mockImplementation((args) => {
-          const prNumber = args.pull_number;
-          const user = PRs.find((pr) => pr.number === prNumber).user.login;
-          const users = Array.isArray(user) ? user : [user];
-          return {
-            data: users.map((u) => ({
-              commit: { author: { name: u } },
-            })),
-          };
-        }),
       merge: jest.fn().mockName('github.pulls.merge'),
     },
     repos: {

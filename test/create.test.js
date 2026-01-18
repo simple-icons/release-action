@@ -24,7 +24,7 @@ The new version will be: **v2.0.0**
 - AddThis (#508) (@PeterShaggyNoble)
 - Adobe (#504) (@fbernhart)
 - Feedly (#502) (@mondeja)
-- Intel (#507) (@mondeja)
+- Intel (#507) (@mondeja, @LitoMore)
 - Mozilla (#505) (@adamrusted)
 - Opera (#510) (@fbernhart)
 - Postman (#506) (@LitoMore)

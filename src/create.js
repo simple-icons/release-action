@@ -88,7 +88,8 @@ function prNumbersToString(prNumbers) {
 }
 
 function authorsToString(authors) {
-  return authors.map((author) => `@${author}`).join(', ');
+  const flatAuthors = [...new Set(authors.flat())];
+  return flatAuthors.map((author) => `@${author}`).join(', ');
 }
 
 // GitHub API
@@ -253,11 +254,13 @@ async function getFilesSinceLastRelease(core, client, context) {
         );
       }
 
+      const authors = await getFinalCommitAuthors(client, context, pr);
+
       for (let file of await getPrFiles(core, client, context, pr.number)) {
         core.info(`found '${file.path}' in PR #${pr.number}`);
         file.prNumber = pr.number;
-        file.author = pr.user.login;
         file.merged_at = pr.merged_at;
+        file.authors = authors;
         files.push(file);
       }
     }
@@ -268,6 +271,83 @@ async function getFilesSinceLastRelease(core, client, context) {
     }
 
     page += 1;
+  }
+}
+
+/**
+ * Gets all authors from a PR, including the main author and co-authors
+ * from the final merge commit message.
+ *
+ * @param {Object} client - GitHub client (Octokit)
+ * @param {Object} context - GitHub Actions context
+ * @param {Object} pr - Pull Request object
+ * @returns {Promise<string[]>} Array of GitHub usernames of all authors
+ */
+async function getFinalCommitAuthors(client, context, pr) {
+  const coAuthorExpr = /^Co-authored-by:\s*(.+?)\s*<(.+?)>\s*$/gim;
+
+  try {
+    if (!pr.merge_commit_sha) {
+      return [pr.user.login];
+    }
+
+    const { data: commitDetails } = await client.rest.git.getCommit({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      commit_sha: pr.merge_commit_sha,
+    });
+
+    const authors = new Set([pr.user.login]);
+
+    if (commitDetails.author?.name) {
+      const authorEmail = commitDetails.author.email;
+      const githubUserMatch = authorEmail?.match(
+        /^(\d+\+)?(.+?)@users\.noreply\.github\.com$/,
+      );
+
+      if (githubUserMatch) {
+        authors.add(githubUserMatch[2]);
+      } else if (pr.merged_by?.login) {
+        authors.add(pr.merged_by.login);
+      }
+    } else if (pr.merged_by?.login) {
+      authors.add(pr.merged_by.login);
+    }
+
+    const commitMessage = commitDetails.message;
+    const coAuthorMatches = commitMessage.matchAll(coAuthorExpr);
+
+    for (const match of coAuthorMatches) {
+      const email = match[2];
+
+      const githubUserMatch = email.match(
+        /^(\d+\+)?(.+?)@users\.noreply\.github\.com$/,
+      );
+
+      if (githubUserMatch) {
+        authors.add(githubUserMatch[2]);
+      } else {
+        const name = match[1].trim();
+        try {
+          const { data: searchResults } = await client.rest.search.users({
+            q: `${email} in:email`,
+          });
+
+          if (searchResults.items.length > 0) {
+            authors.add(searchResults.items[0].login);
+          } else {
+            authors.add(name);
+          }
+        } catch (error) {
+          authors.add(name);
+        }
+      }
+    }
+
+    return Array.from(authors);
+  } catch (error) {
+    core.error(`Error getting authors for PR #${pr.number}:`, error);
+    return [pr.user?.login || 'unknown'];
   }
 }
 
@@ -284,7 +364,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_MODIFIED) {
@@ -299,7 +379,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       },
     ];
   } else if (isIconFile(file.path) && file.status === STATUS_REMOVED) {
@@ -313,7 +393,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         name: he.decode(svgTitleMatch[1]),
         path: file.path,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       },
     ];
   } else if (isSimpleIconsDataFile(file.path)) {
@@ -348,7 +428,7 @@ async function getChangesFromFile(core, file, client, context, id) {
         changeType: CHANGE_TYPE_UPDATE,
         name: name,
         prNumbers: [file.prNumber],
-        authors: [file.author],
+        authors: file.authors,
       });
     }
 

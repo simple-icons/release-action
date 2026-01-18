@@ -106,7 +106,7 @@ const PRs = [
     number: 507,
     merged_at: '2011-01-26T19:01:12Z',
     base: { ref: 'develop' },
-    user: { login: 'mondeja' },
+    user: { login: ['mondeja', 'LitoMore'] },
   },
   {
     //  9: PR that modifies an SVG and modifies that icon's color and source

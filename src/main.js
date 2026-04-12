@@ -27,9 +27,15 @@ async function main(
       core.info('PR review detected; checking if release PR should be merged');
       await mergeOnApprove(core, client, github.context);
       break;
-    case EVENT_DEBUG:
-      core.info((await makeReleaseNotes(core, client, github.context)).notes);
+    case EVENT_DEBUG: {
+      const { title, notes } = await makeReleaseNotes(
+        core,
+        client,
+        github.context,
+      );
+      core.info([title, notes].filter(Boolean).join('\n\n'));
       break;
+    }
     default:
       core.error(`Event '${event}' not supported by the release action`);
   }

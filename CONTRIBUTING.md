@@ -3,7 +3,7 @@
 Simple Icons welcomes contributions and corrections. Before contributing, please make sure you have read the guidelines below. If you decide to contribute anything, please do the following:
 
 1. Fork this repository
-1. Create a new branch from the latest `master` (read more [here](https://guides.github.com/introduction/flow/))
+1. Create a new branch from the latest `main` (read more [here](https://guides.github.com/introduction/flow/))
 1. Start hacking on the new branch
 1. Commit and push to the new branch
 1. Make a pull request
@@ -35,6 +35,6 @@ SI_REPOSITORY_TOKEN='your-repo-token' npm run preview
 
 1. Update the `version` field in `package.json`
 2. Run `npm install` to apply all `package.json` changes to `package-lock.json`
-3. Create a commit to `master` branch with the `Release v{major}.{minor}.{patch}` commit message, and push the commit
+3. Create a commit to `main` branch with the `Release v{major}.{minor}.{patch}` commit message, and push the commit
 4. Create a release on the latest commit, the release tag should be `v{major}.{minor}.{patch}`
-5. Switch to the `v{major}` branch, rebase the `master` branch to `v{major}` branch, and push to the remote
+5. Switch to the `v{major}` branch, rebase the `main` branch to `v{major}` branch, and push to the remote

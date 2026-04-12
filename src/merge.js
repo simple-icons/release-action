@@ -13,8 +13,7 @@ async function doMerge(core, client, context, pr) {
   core.info(`Merging #${pr.number}`);
 
   const newVersion = pr.body.split('**')[1];
-  const commitTitle =
-    pr.title.replace('Publish', 'Release') + ` (${newVersion})`;
+  const commitTitle = `Release ${newVersion.replace(/^v/, '')}`;
   const commitMessage = '#' + pr.body.split('#').slice(1).join('#');
 
   await client.rest.pulls.merge({

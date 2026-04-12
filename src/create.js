@@ -544,36 +544,8 @@ async function getNextVersionNumber(client, context, changes) {
   return newVersion;
 }
 
-function createReleaseTitle(newIcons, updatedIcons, removedIcons) {
-  let releaseTitle = 'Publish';
-
-  if (newIcons.length === 1) {
-    releaseTitle += ' 1 new icon';
-  } else if (newIcons.length > 1) {
-    releaseTitle += ` ${newIcons.length} new icons`;
-  }
-
-  if (updatedIcons.length > 0 && newIcons.length > 0) {
-    releaseTitle += ' and';
-  }
-
-  if (updatedIcons.length === 1) {
-    releaseTitle += ' 1 updated icon';
-  } else if (updatedIcons.length > 1) {
-    releaseTitle += ` ${updatedIcons.length} updated icons`;
-  }
-
-  if (removedIcons.length > 0 && newIcons.length + updatedIcons.length > 0) {
-    releaseTitle += ' and';
-  }
-
-  if (removedIcons.length === 1) {
-    releaseTitle += ' 1 removed icon';
-  } else if (removedIcons.length > 1) {
-    releaseTitle += ` ${removedIcons.length} removed icons`;
-  }
-
-  return releaseTitle;
+function createReleaseTitle(newVersion) {
+  return `Release ${newVersion}`;
 }
 
 function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
@@ -581,7 +553,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
     alphaSort({ caseInsensitive: true })(a.name, b.name);
 
   let releaseHeader = '_this Pull Request was automatically generated_\n\n';
-  releaseHeader += `The new version will be: **v${newVersion}**\n`;
+  releaseHeader += `The new version will be: **${newVersion}**\n`;
 
   let releaseNotes = '';
   if (newIcons.length > 0) {
@@ -683,7 +655,7 @@ export async function makeReleaseNotes(core, client, context) {
     modified: updatedIcons,
     removed: removedIcons,
   });
-  const title = createReleaseTitle(newIcons, updatedIcons, removedIcons);
+  const title = createReleaseTitle(newVersion);
   const notes = createReleaseNotes(
     newVersion,
     newIcons,

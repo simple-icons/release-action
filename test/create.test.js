@@ -6,7 +6,7 @@ import { makeRelease } from '../src/create.js';
 const client = new github.getOctokit('token');
 const expectedNotes = `_this Pull Request was automatically generated_
 
-The new version will be: **v2.0.0**
+The new version will be: **2.0.0**
 
 ## 6 new icons
 
@@ -62,7 +62,7 @@ test.each([
       repo: expect.any(String),
       title: expect.any(String),
       body: expect.stringContaining(
-        `The new version will be: **v${expectedVersion}**`,
+        `The new version will be: **${expectedVersion}**`,
       ),
       head: expect.any(String),
       base: expect.any(String),
@@ -71,13 +71,10 @@ test.each([
 });
 
 test.each([
-  ['patch', 'Publish 1 updated icon'],
-  ['add-and-update', 'Publish 2 new icons and 1 updated icon'],
-  ['add-and-remove', 'Publish 2 new icons and 1 removed icon'],
-  [
-    'add-remove-and-update',
-    'Publish 2 new icons and 1 updated icon and 1 removed icon',
-  ],
+  ['patch', 'Release 1.0.1'],
+  ['add-and-update', 'Release 1.1.0'],
+  ['add-and-remove', 'Release 2.0.0'],
+  ['add-remove-and-update', 'Release 2.0.0'],
 ])('correct release title (%s)', async (token, expectedTitle) => {
   expect.assertions(1);
 

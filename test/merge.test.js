@@ -9,10 +9,10 @@ const APPROVED = 'approved';
 const CHANGES_REQUESTED = 'changes_requested';
 const COMMENTED = 'commented';
 
-const prTitle = 'Publish 3 new icons an 2 updated icons';
+const prTitle = 'Release 1.4.0';
 const prBody = `_this Pull Request was automatically generated_
 
-The new version will be: **v1.4.0**
+The new version will be: **1.4.0**
 
 # New Icons
 
@@ -49,7 +49,11 @@ test.each(['OWNER', 'MEMBER'])(
     };
 
     await mergeOnApprove(core, client, github.context);
-    expect(client.rest.pulls.merge).toHaveBeenCalled();
+    expect(client.rest.pulls.merge).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commit_title: 'Release 1.4.0',
+      }),
+    );
   },
 );
 

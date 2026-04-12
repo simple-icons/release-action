@@ -557,7 +557,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
 
   let releaseNotes = '';
   if (newIcons.length > 0) {
-    releaseNotes += `\n## ${newIcons.length} new ${newIcons.length > 1 ? 'icons' : 'icon'}\n\n`;
+    releaseNotes += `\n### ${newIcons.length} new ${newIcons.length > 1 ? 'icons' : 'icon'}\n\n`;
     for (let newIcon of newIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(newIcon.prNumbers);
       const authors = authorsToString(newIcon.authors);
@@ -566,7 +566,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   }
 
   if (updatedIcons.length > 0) {
-    releaseNotes += `\n## ${updatedIcons.length} updated ${updatedIcons.length > 1 ? 'icons' : 'icon'}\n\n`;
+    releaseNotes += `\n### ${updatedIcons.length} updated ${updatedIcons.length > 1 ? 'icons' : 'icon'}\n\n`;
     for (let updatedIcon of updatedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(updatedIcon.prNumbers);
       const authors = authorsToString(updatedIcon.authors);
@@ -575,7 +575,7 @@ function createReleaseNotes(newVersion, newIcons, updatedIcons, removedIcons) {
   }
 
   if (removedIcons.length > 0) {
-    releaseNotes += `\n## ${removedIcons.length} removed ${removedIcons.length > 1 ? 'icons' : 'icon'}\n\n`;
+    releaseNotes += `\n### ${removedIcons.length} removed ${removedIcons.length > 1 ? 'icons' : 'icon'}\n\n`;
     for (let removedIcon of removedIcons.sort(sortAlphabetically)) {
       const prs = prNumbersToString(removedIcon.prNumbers);
       const authors = authorsToString(removedIcon.authors);
